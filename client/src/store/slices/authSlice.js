@@ -9,6 +9,7 @@ const authSlice = createSlice({
         message: null,
         user: null,
         isAuthenticated: false,
+        authChecked: false, 
     },
     reducers: {
         registerRequest(state) {
@@ -34,6 +35,7 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            state.authChecked = true;
         },
         OTPVerificationFailed(state, action) {
             state.loading = false;
@@ -50,6 +52,7 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            state.authChecked = true;
         },
         loginFailed(state, action) {
             state.loading = false;
@@ -66,6 +69,7 @@ const authSlice = createSlice({
             state.message = action.payload;
             state.isAuthenticated = false;
             state.user = null;
+            state.authChecked = true;
         },
         logoutFailed(state, action) {
             state.loading = false;
@@ -82,12 +86,16 @@ const authSlice = createSlice({
             state.loading = false;
             state.user = action.payload.user;
             state.isAuthenticated = true;
+            state.authChecked = true;
         },
         getUserFailed(state, action){
             state.loading = false;
-            state.error = action.payload;
+            if (action.payload && action.payload !== "User is not authenticated") {
+                state.error = action.payload;
+            }
             state.user = null;
             state.isAuthenticated = false;
+            state.authChecked = true;
         },
 
         forgotPasswordRequest(state){
@@ -114,8 +122,9 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.user = action.payload.user;
             state.isAuthenticated = true;
+            state.authChecked = true;
         },
-        resetPasswordFailed(state){
+        resetPasswordFailed(state, action){
             state.loading = false;
             state.error = action.payload;
         },
@@ -138,12 +147,20 @@ const authSlice = createSlice({
             state.error = null;
             state.loading = false;
             state.message = null;
+        },
+        
+        clearError(state) {
+            state.error = null;
         }
     },
 });
 
 export const resetSlice = () => (dispatch) => {
     dispatch(authSlice.actions.resetAuthSlice());
+};
+
+export const clearError = () => (dispatch) => {
+    dispatch(authSlice.actions.clearError());
 };
 
 export const register = (data) => async (dispatch) => {
@@ -231,7 +248,13 @@ export const getUser = () => async (dispatch) => {
             dispatch(authSlice.actions.getUserFailed("Unexpected response from server"));
         }
     } catch (error) {
-        dispatch(authSlice.actions.getUserFailed(error.response?.data?.message || "Failed to get user information"));
+        // Handle authentication failures gracefully
+        if (error.response?.status === 401) {
+            // Don't show error for unauthenticated users
+            dispatch(authSlice.actions.getUserFailed(null));
+        } else {
+            dispatch(authSlice.actions.getUserFailed(error.response?.data?.message || "Failed to get user information"));
+        }
     }
 };
 
@@ -248,7 +271,7 @@ export const forgotPassword = (email) => async (dispatch) => {
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.forgotPasswordSuccess(res.data.message)); 
         } else {
-            dispatch(authSlice.actions.forgotPasswordFailed(error.response?.data?.message || "Unexpected response from server"));
+            dispatch(authSlice.actions.forgotPasswordFailed("Unexpected response from server"));
         }
     } catch (error) {
         dispatch(authSlice.actions.forgotPasswordFailed(error.response?.data?.message || "Password recovery request failed"));
@@ -267,13 +290,11 @@ export const resetPassword = (data, token) => async (dispatch) => {
         });
 
         if (res.status === 200 || res.status === 201) {
-            dispatch(authSlice.actions.resetPasswordSuccess(res.data.message));
+            dispatch(authSlice.actions.resetPasswordSuccess(res.data));
         } else {
             dispatch(authSlice.actions.resetPasswordFailed("Unexpected response from server"));
         }
     } catch (error) {
-        // console.error("Full error response:", error.response);
-        // console.error("Error message:", error.response?.data?.message);
         dispatch(authSlice.actions.resetPasswordFailed(error.response?.data?.message || "Password reset failed"));
     }
 };
