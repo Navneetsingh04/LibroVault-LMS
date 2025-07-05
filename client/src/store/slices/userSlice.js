@@ -3,6 +3,30 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { toggleAddNewAdminPopup } from "./popUpSlice";
 
+// Helper function to get axios config with auth headers
+const getAuthConfig = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    }
+  };
+};
+
+// Helper function for multipart form data with auth
+const getAuthConfigMultipart = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "multipart/form-data",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    }
+  };
+};
+
 // Utility to parse error messages consistently
 const parseError = (error, defaultMessage) => {
   if (error.response) {
@@ -88,7 +112,7 @@ export const fetchAllUsers = () => async (dispatch) => {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/user/all",
       { 
-        withCredentials: true,
+        ...getAuthConfig(),
         timeout: 30000,
       }
     );
@@ -120,10 +144,7 @@ export const addNewAdmin = (data) => async (dispatch) => {
       "https://librovault.onrender.com/api/v1/user/add/new-admin", 
       data, 
       {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        ...getAuthConfigMultipart(),
         timeout: 30000,
       }
     );

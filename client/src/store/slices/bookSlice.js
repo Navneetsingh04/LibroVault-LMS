@@ -2,6 +2,29 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleAddBookPopup } from "./popUpSlice";
 
+// Helper function to get axios config with auth headers
+const getAuthConfig = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    }
+  };
+};
+
+// Helper function for multipart form data with auth
+const getAuthConfigMultipart = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    withCredentials: true,
+    headers: {
+      ...(token && { "Authorization": `Bearer ${token}` })
+    }
+  };
+};
+
 // Utility to parse error messages consistently
 const parseError = (error, defaultMessage) => {
   if (error.response) {
@@ -93,7 +116,7 @@ export const fetchAllBooks = () => async (dispatch) => {
   dispatch(bookSlice.actions.fetchBooksRequest());
   try {
     const response = await axios.get("https://librovault.onrender.com/api/v1/book/all", {
-      withCredentials: true,
+      ...getAuthConfig(),
       timeout: 30000, // 30 second timeout
     });
     dispatch(bookSlice.actions.fetchBooksSuccess(response.data.books));
@@ -117,8 +140,7 @@ export const addBook = (bookData) => async (dispatch) => {
       "https://librovault.onrender.com/api/v1/book/admin/add",
       bookData,
       {
-        withCredentials: true,
-        headers,
+        ...(isFormData ? getAuthConfigMultipart() : getAuthConfig()),
         timeout: 30000, // 30 second timeout
       }
     );
@@ -142,7 +164,7 @@ export const deleteBook = (bookId) => async (dispatch) => {
     const response = await axios.delete(
       `https://librovault.onrender.com/api/v1/book/delete/${bookId}`,
       {
-        withCredentials: true,
+        ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
       }
     );

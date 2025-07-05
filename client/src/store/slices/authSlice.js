@@ -1,6 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Helper function to get axios config with auth headers
+const getAuthConfig = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+        withCredentials: true,
+        headers: {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` })
+        }
+    };
+};
+
+// Helper function for multipart form data with auth
+const getAuthConfigMultipart = () => {
+    const token = localStorage.getItem('authToken');
+    return {
+        withCredentials: true,
+        headers: {
+            ...(token && { "Authorization": `Bearer ${token}` })
+        }
+    };
+};
+
 const authSlice = createSlice({
     name: "auth",
     initialState: {
@@ -34,6 +57,10 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            // Store token in localStorage for cross-origin requests
+            if (action.payload.token) {
+                localStorage.setItem('authToken', action.payload.token);
+            }
         },
         OTPVerificationFailed(state, action) {
             state.loading = false;
@@ -50,6 +77,10 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            // Store token in localStorage for cross-origin requests
+            if (action.payload.token) {
+                localStorage.setItem('authToken', action.payload.token);
+            }
         },
         loginFailed(state, action) {
             state.loading = false;
@@ -66,6 +97,8 @@ const authSlice = createSlice({
             state.message = action.payload;
             state.isAuthenticated = false;
             state.user = null;
+            // Clear token from localStorage
+            localStorage.removeItem('authToken');
         },
         logoutFailed(state, action) {
             state.loading = false;
@@ -88,6 +121,8 @@ const authSlice = createSlice({
             state.error = action.payload;
             state.user = null;
             state.isAuthenticated = false;
+            // Clear token from localStorage on auth failure
+            localStorage.removeItem('authToken');
         },
 
         forgotPasswordRequest(state){
@@ -204,9 +239,7 @@ export const login = (data) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
     try {
         dispatch(authSlice.actions.logoutRequest());
-        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/logout`, {
-            withCredentials: true,
-        });
+        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/logout`, getAuthConfig());
         
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.logoutSuccess(res.data.message));
@@ -214,6 +247,8 @@ export const logout = () => async (dispatch) => {
             dispatch(authSlice.actions.logoutFailed("Unexpected response from server"));
         }
     } catch (error) {
+        // Even if logout fails on server, clear local data
+        localStorage.removeItem('authToken');
         dispatch(authSlice.actions.logoutFailed(error.response?.data?.message || "Logout failed"));
     }
 };
@@ -222,7 +257,7 @@ export const getUser = () => async (dispatch) => {
     try {
         dispatch(authSlice.actions.getUserRequest());
         const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/me`, {
-            withCredentials: true,
+            ...getAuthConfig(),
             timeout: 30000, // 30 second timeout
         });
         
@@ -238,6 +273,7 @@ export const getUser = () => async (dispatch) => {
         if (error.response?.status === 401) {
             // Clear any stored auth data
             localStorage.removeItem('user');
+            localStorage.removeItem('authToken');
             sessionStorage.removeItem('user');
             dispatch(authSlice.actions.getUserFailed("Session expired. Please log in again."));
         } else {
@@ -294,12 +330,7 @@ export const resetPassword = (data, token) => async (dispatch) => {
 export const updatePassword = (data) => async (dispatch) => {
     try {
         dispatch(authSlice.actions.updatePasswordRequest());
-        const res = await axios.put(`https://librovault.onrender.com/api/v1/auth/password/update`, data, {
-            withCredentials: true,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+        const res = await axios.put(`https://librovault.onrender.com/api/v1/auth/password/update`, data, getAuthConfig());
         
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.updatePasswordSuccess(res.data.message));

@@ -2,6 +2,18 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleRecordBookPopup } from "./popUpSlice";
 
+// Helper function to get axios config with auth headers
+const getAuthConfig = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { "Authorization": `Bearer ${token}` })
+    }
+  };
+};
+
 // Utility to parse error messages consistently
 const parseError = (error, defaultMessage) => {
   if (error.response) {
@@ -114,7 +126,7 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/my-borrowed-books",
       { 
-        withCredentials: true,
+        ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
       }
     );
@@ -142,7 +154,7 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/borrowed-books-by-users",
       { 
-        withCredentials: true,
+        ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
       }
     );
@@ -171,10 +183,7 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
       `https://librovault.onrender.com/api/v1/borrow/record-borrow-book/${id}`,
       { email },
       {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
       }
     );
@@ -204,10 +213,7 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
       `https://librovault.onrender.com/api/v1/borrow/return-borrowed-book/${id}`,
       { email },
       {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
       }
     );

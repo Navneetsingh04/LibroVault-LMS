@@ -6,13 +6,19 @@ import { User } from "../models/userModel.js";
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
   console.log("=== Authentication Debug ===");
   console.log("All Cookies:", req.cookies);
-  console.log("Headers:", req.headers);
+  console.log("Authorization Header:", req.headers.authorization);
   console.log("Origin:", req.headers.origin);
   
-  const { token } = req.cookies;
+  // Try to get token from cookies first, then from Authorization header
+  let token = req.cookies.token;
+  
+  if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.substring(7);
+    console.log("🔍 Token found in Authorization header");
+  }
   
   if (!token) {
-    console.log("❌ No token found in cookies");
+    console.log("❌ No token found in cookies or headers");
     return next(new ErrorHandler("User is not authenticated. Please log in.", 401));
   }
   
