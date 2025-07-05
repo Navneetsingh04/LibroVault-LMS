@@ -60,7 +60,7 @@ const UserDashboard = () => {
   }, [userBorrowedBooks]);
 
   const data = {
-    labels: ["Borrowed", "Returned"],
+    labels: ["Total Borrowed Books", "Total Returned Books"],
     datasets: [
       {
         label: "Books",
@@ -197,13 +197,13 @@ const UserDashboard = () => {
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#4F46E5]"></span>
                   <span className="text-xs sm:text-sm font-medium">
-                    Total Borrowed Books ({totalBorrowedBooks})
+                    Borrowed ({totalBorrowedBooks})
                   </span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#10B981]"></span>
                   <span className="text-xs sm:text-sm font-medium">
-                    Total Returned Books({totalReturnedBooks})
+                    Returned ({totalReturnedBooks})
                   </span>
                 </p>
               </div>
