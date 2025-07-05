@@ -223,6 +223,7 @@ export const getUser = () => async (dispatch) => {
         dispatch(authSlice.actions.getUserRequest());
         const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/me`, {
             withCredentials: true,
+            timeout: 30000, // 30 second timeout
         });
         
         if (res.status === 200 || res.status === 201) {
@@ -231,7 +232,18 @@ export const getUser = () => async (dispatch) => {
             dispatch(authSlice.actions.getUserFailed("Unexpected response from server"));
         }
     } catch (error) {
-        dispatch(authSlice.actions.getUserFailed(error.response?.data?.message || "Failed to get user information"));
+        console.error("Get user error:", error);
+        
+        // Handle 401 errors specifically (user not authenticated)
+        if (error.response?.status === 401) {
+            // Clear any stored auth data
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
+            dispatch(authSlice.actions.getUserFailed("Session expired. Please log in again."));
+        } else {
+            const message = error.response?.data?.message || "Failed to get user information";
+            dispatch(authSlice.actions.getUserFailed(message));
+        }
     }
 };
 

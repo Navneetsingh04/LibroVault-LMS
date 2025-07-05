@@ -4,17 +4,37 @@ import ErrorHandler from "./errorMiddlewares.js"
 import { User } from "../models/userModel.js";
 
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-   console.log("Cookies:", req.cookies);
+  console.log("=== Authentication Debug ===");
+  console.log("All Cookies:", req.cookies);
+  console.log("Headers:", req.headers);
+  console.log("Origin:", req.headers.origin);
+  
   const { token } = req.cookies;
+  
   if (!token) {
-    return next(new ErrorHandler("User is not authenticated", 401));
+    console.log("❌ No token found in cookies");
+    return next(new ErrorHandler("User is not authenticated. Please log in.", 401));
   }
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  req.user = await User.findById(decoded.id).select("-verificationCode -verificationCodeExpire -resetPasswordToken -resetPasswordExpire");
-  if(!req.user) {
-    return next(new ErrorHandler("User not found", 404));
+  
+  try {
+    console.log("🔍 Token found, verifying...");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log("✅ Token verified, user ID:", decoded.id);
+    
+    const user = await User.findById(decoded.id).select("-verificationCode -verificationCodeExpire -resetPasswordToken -resetPasswordExpire");
+    
+    if (!user) {
+      console.log("❌ User not found in database");
+      return next(new ErrorHandler("User not found", 404));
+    }
+    
+    console.log("✅ User authenticated:", user.email);
+    req.user = user;
+    next();
+  } catch (error) {
+    console.log("❌ Token verification failed:", error.message);
+    return next(new ErrorHandler("Invalid or expired token. Please log in again.", 401));
   }
-  next();
 });
 
 
