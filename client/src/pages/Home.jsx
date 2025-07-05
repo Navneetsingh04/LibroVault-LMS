@@ -14,7 +14,16 @@ const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState("Dashboard");
 
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, loading, initialized } = useSelector((state) => state.auth);
+
+  // Show loading spinner while checking authentication or if not initialized
+  if (loading || !initialized) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;

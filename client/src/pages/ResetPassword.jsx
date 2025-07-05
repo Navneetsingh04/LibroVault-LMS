@@ -30,8 +30,6 @@ const ResetPassword = () => {
     formData.append("password", password);
     formData.append("confirmPassword", confirmPassword);
   
-    // console.log("Sending data:", data);
-    // console.log("Token:", token);
 
     dispatch(resetPassword(formData, token));
   };

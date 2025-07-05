@@ -4,11 +4,6 @@ import ErrorHandler from "./errorMiddlewares.js"
 import { User } from "../models/userModel.js";
 
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-  console.log("=== Authentication Debug ===");
-  console.log("All Cookies:", req.cookies);
-  console.log("Authorization Header:", req.headers.authorization);
-  console.log("Origin:", req.headers.origin);
-  
   // Try to get token from cookies first, then from Authorization header
   let token = req.cookies.token;
   

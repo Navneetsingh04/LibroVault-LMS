@@ -166,7 +166,6 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save({ validateBeforeSave: false });
   const resetPasswordUrl = `http://localhost:5173/password/reset/${resetToken}`;
-  // console.log(resetPasswordUrl)
 
   const message = generateForgotPasswordEmailTemplate(resetPasswordUrl);
 
@@ -220,8 +219,6 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
-  console.log("Request Body:", req.body);
-  console.log("User from req:", req.user);
   const user = await User.findById(req.user).select("+password");
   if (!user) {
     return next(new ErrorHandler("User not found", 404));

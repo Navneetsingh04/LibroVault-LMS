@@ -18,33 +18,10 @@ const getAuthConfig = () => {
             localStorage.setItem('authToken', token); // Store for future use
         }
     }
-    console.log("Token from localStorage:", localStorage.getItem('authToken'));
-    console.log("Token from cookies:", getCookie('token'));
-    console.log("Using token:", token);
-    
     return {
         withCredentials: true,
         headers: {
             "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` })
-        }
-    };
-};
-
-// Helper function for multipart form data with auth
-const getAuthConfigMultipart = () => {
-    // Try to get token from localStorage first, then from cookies
-    let token = localStorage.getItem('authToken');
-    if (!token) {
-        token = getCookie('token');
-        if (token) {
-            localStorage.setItem('authToken', token); // Store for future use
-        }
-    }
-    
-    return {
-        withCredentials: true,
-        headers: {
             ...(token && { "Authorization": `Bearer ${token}` })
         }
     };
@@ -58,8 +35,30 @@ const authSlice = createSlice({
         message: null,
         user: null,
         isAuthenticated: false,
+        initialized: false, // Add flag to track if app has initialized
     },
     reducers: {
+        initializeAppRequest(state) {
+            state.loading = true;
+            state.error = null;
+        },
+        initializeAppSuccess(state, action) {
+            state.loading = false;
+            state.initialized = true;
+            if (action.payload.user) {
+                state.user = action.payload.user;
+                state.isAuthenticated = true;
+            }
+        },
+        initializeAppFailed(state) {
+            state.loading = false;
+            state.initialized = true;
+            state.isAuthenticated = false;
+            state.user = null;
+            // Clear invalid token
+            localStorage.removeItem('authToken');
+        },
+        
         registerRequest(state) {
             state.loading = true;
             state.error = null;
@@ -83,6 +82,7 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            state.initialized = true;
             // Store token in localStorage for cross-origin requests
             if (action.payload.token) {
                 localStorage.setItem('authToken', action.payload.token);
@@ -103,16 +103,15 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
+            state.initialized = true;
             // Store token in localStorage for cross-origin requests
             if (action.payload.token) {
                 localStorage.setItem('authToken', action.payload.token);
-                console.log("Token stored in localStorage:", action.payload.token);
             } else {
                 // Try to get token from cookies if not in response
                 const cookieToken = getCookie('token');
                 if (cookieToken) {
                     localStorage.setItem('authToken', cookieToken);
-                    console.log("Token stored from cookies:", cookieToken);
                 }
             }
         },
@@ -131,6 +130,7 @@ const authSlice = createSlice({
             state.message = action.payload;
             state.isAuthenticated = false;
             state.user = null;
+            state.initialized = true; // Keep initialized as true
             // Clear token from localStorage
             localStorage.removeItem('authToken');
         },
@@ -155,8 +155,11 @@ const authSlice = createSlice({
             state.error = action.payload;
             state.user = null;
             state.isAuthenticated = false;
+            // Don't reset initialized here unless it's a 401 error
             // Clear token from localStorage on auth failure
-            localStorage.removeItem('authToken');
+            if (action.payload && action.payload.includes("Session expired")) {
+                localStorage.removeItem('authToken');
+            }
         },
 
         forgotPasswordRequest(state){
@@ -183,6 +186,7 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.user = action.payload.user;
             state.isAuthenticated = true;
+            state.initialized = true;
         },
         resetPasswordFailed(state, action){
             state.loading = false;
@@ -210,6 +214,33 @@ const authSlice = createSlice({
         }
     },
 });
+
+// Initialize app by checking for existing authentication
+export const initializeApp = () => async (dispatch) => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+        dispatch(authSlice.actions.initializeAppFailed());
+        return;
+    }
+
+    try {
+        dispatch(authSlice.actions.initializeAppRequest());
+        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/me`, {
+            ...getAuthConfig(),
+            timeout: 30000,
+        });
+        
+        if (res.status === 200 || res.status === 201) {
+            dispatch(authSlice.actions.initializeAppSuccess(res.data));
+        } else {
+            dispatch(authSlice.actions.initializeAppFailed());
+        }
+    } catch (error) {
+        console.error("App initialization error:", error);
+        dispatch(authSlice.actions.initializeAppFailed());
+    }
+};
 
 export const resetSlice = () => (dispatch) => {
     dispatch(authSlice.actions.resetAuthSlice());
@@ -258,9 +289,6 @@ export const login = (data) => async (dispatch) => {
           "Content-Type": "application/json",
         },
       });
-  
-      console.log("Login response:", res.data);
-      console.log("Token in response:", res.data.token);
   
       if (res.status === 200 || res.status === 201) {
         dispatch(authSlice.actions.loginSuccess(res.data));

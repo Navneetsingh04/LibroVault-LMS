@@ -39,24 +39,23 @@ const UserDashboard = () => {
   const [totalReturnedBooks, setTotalReturnedBooks] = useState(0);
 
   useEffect(() => {
-    let totalBorrowed = 0;
-    let totalReturned = 0;
-    
-    userBorrowedBooks?.forEach((book) => {
-      console.log("Book:", book.title || book.name, "Return Date:", book.returnDate);
-      
-      if (book.returnDate === null) {
-        totalBorrowed++; // Book is still borrowed (no return date)
-  
-      } else if (book.returnDate !== null) {
-        totalReturned++; // Book has been returned (has return date)
-      }
-    });
-    
-    console.log("Final counts - Borrowed:", totalBorrowed, "Returned:", totalReturned);
-    setTotalBorrowedBooks(totalBorrowed);
-    setTotalReturnedBooks(totalReturned);
-  }, [userBorrowedBooks]);
+  if (!userBorrowedBooks || userBorrowedBooks.length === 0) return;
+
+  let totalBorrowed = 0;
+  let totalReturned = 0;
+
+  userBorrowedBooks.forEach((book) => {
+    if (!book.returnDate) {
+      totalBorrowed++;
+    } else {
+      totalReturned++;
+    }
+  });
+
+  setTotalBorrowedBooks(totalBorrowed);
+  setTotalReturnedBooks(totalReturned);
+}, [userBorrowedBooks]);
+
 
   const data = {
     labels: ["Total Borrowed Books", "Total Returned Books"],
