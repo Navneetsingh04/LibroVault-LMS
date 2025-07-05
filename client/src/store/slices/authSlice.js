@@ -35,30 +35,8 @@ const authSlice = createSlice({
         message: null,
         user: null,
         isAuthenticated: false,
-        initialized: false, // Add flag to track if app has initialized
     },
     reducers: {
-        initializeAppRequest(state) {
-            state.loading = true;
-            state.error = null;
-        },
-        initializeAppSuccess(state, action) {
-            state.loading = false;
-            state.initialized = true;
-            if (action.payload.user) {
-                state.user = action.payload.user;
-                state.isAuthenticated = true;
-            }
-        },
-        initializeAppFailed(state) {
-            state.loading = false;
-            state.initialized = true;
-            state.isAuthenticated = false;
-            state.user = null;
-            // Clear invalid token
-            localStorage.removeItem('authToken');
-        },
-        
         registerRequest(state) {
             state.loading = true;
             state.error = null;
@@ -82,7 +60,6 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
-            state.initialized = true;
             // Store token in localStorage for cross-origin requests
             if (action.payload.token) {
                 localStorage.setItem('authToken', action.payload.token);
@@ -103,7 +80,6 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.isAuthenticated = true;
             state.user = action.payload.user;
-            state.initialized = true;
             // Store token in localStorage for cross-origin requests
             if (action.payload.token) {
                 localStorage.setItem('authToken', action.payload.token);
@@ -130,7 +106,6 @@ const authSlice = createSlice({
             state.message = action.payload;
             state.isAuthenticated = false;
             state.user = null;
-            state.initialized = true; // Keep initialized as true
             // Clear token from localStorage
             localStorage.removeItem('authToken');
         },
@@ -155,7 +130,6 @@ const authSlice = createSlice({
             state.error = action.payload;
             state.user = null;
             state.isAuthenticated = false;
-            // Don't reset initialized here unless it's a 401 error
             // Clear token from localStorage on auth failure
             if (action.payload && action.payload.includes("Session expired")) {
                 localStorage.removeItem('authToken');
@@ -186,7 +160,6 @@ const authSlice = createSlice({
             state.message = action.payload.message;
             state.user = action.payload.user;
             state.isAuthenticated = true;
-            state.initialized = true;
         },
         resetPasswordFailed(state, action){
             state.loading = false;
@@ -214,33 +187,6 @@ const authSlice = createSlice({
         }
     },
 });
-
-// Initialize app by checking for existing authentication
-export const initializeApp = () => async (dispatch) => {
-    const token = localStorage.getItem('authToken');
-    
-    if (!token) {
-        dispatch(authSlice.actions.initializeAppFailed());
-        return;
-    }
-
-    try {
-        dispatch(authSlice.actions.initializeAppRequest());
-        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/me`, {
-            ...getAuthConfig(),
-            timeout: 30000,
-        });
-        
-        if (res.status === 200 || res.status === 201) {
-            dispatch(authSlice.actions.initializeAppSuccess(res.data));
-        } else {
-            dispatch(authSlice.actions.initializeAppFailed());
-        }
-    } catch (error) {
-        console.error("App initialization error:", error);
-        dispatch(authSlice.actions.initializeAppFailed());
-    }
-};
 
 export const resetSlice = () => (dispatch) => {
     dispatch(authSlice.actions.resetAuthSlice());
