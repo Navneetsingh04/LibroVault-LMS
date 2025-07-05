@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,19 +18,18 @@ import {
 
 const AppContent = () => {
   const location = useLocation();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, loading, authChecked } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const publicRoutes = ["/login", "/register", "/password/forgot", "/password/reset"];
   const isPublicRoute = publicRoutes.some((route) => location.pathname.startsWith(route));
 
-  // Only dispatch getUser if not on public route
+  // Always check authentication on app load
   useEffect(() => {
-    if (!isPublicRoute) {
-      dispatch(getUser());
-    }
-  }, [dispatch, isPublicRoute]);
+    dispatch(getUser());
+  }, [dispatch]);
 
+  // Fetch data when user is authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
       dispatch(fetchAllBooks());
@@ -45,6 +44,25 @@ const AppContent = () => {
       }
     }
   }, [isAuthenticated, user, dispatch]);
+
+  // Show loading while checking authentication
+  if (!authChecked && loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // If not authenticated and trying to access protected route, redirect to login
+  if (!isAuthenticated && authChecked && !isPublicRoute) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If authenticated and trying to access public route, redirect to home
+  if (isAuthenticated && authChecked && isPublicRoute) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <>
