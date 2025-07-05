@@ -1,9 +1,27 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Helper function to get cookie value
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+};
+
 // Helper function to get axios config with auth headers
 const getAuthConfig = () => {
-    const token = localStorage.getItem('authToken');
+    // Try to get token from localStorage first, then from cookies
+    let token = localStorage.getItem('authToken');
+    if (!token) {
+        token = getCookie('token');
+        if (token) {
+            localStorage.setItem('authToken', token); // Store for future use
+        }
+    }
+    console.log("Token from localStorage:", localStorage.getItem('authToken'));
+    console.log("Token from cookies:", getCookie('token'));
+    console.log("Using token:", token);
+    
     return {
         withCredentials: true,
         headers: {
@@ -15,7 +33,15 @@ const getAuthConfig = () => {
 
 // Helper function for multipart form data with auth
 const getAuthConfigMultipart = () => {
-    const token = localStorage.getItem('authToken');
+    // Try to get token from localStorage first, then from cookies
+    let token = localStorage.getItem('authToken');
+    if (!token) {
+        token = getCookie('token');
+        if (token) {
+            localStorage.setItem('authToken', token); // Store for future use
+        }
+    }
+    
     return {
         withCredentials: true,
         headers: {
@@ -80,6 +106,14 @@ const authSlice = createSlice({
             // Store token in localStorage for cross-origin requests
             if (action.payload.token) {
                 localStorage.setItem('authToken', action.payload.token);
+                console.log("Token stored in localStorage:", action.payload.token);
+            } else {
+                // Try to get token from cookies if not in response
+                const cookieToken = getCookie('token');
+                if (cookieToken) {
+                    localStorage.setItem('authToken', cookieToken);
+                    console.log("Token stored from cookies:", cookieToken);
+                }
             }
         },
         loginFailed(state, action) {
@@ -225,12 +259,16 @@ export const login = (data) => async (dispatch) => {
         },
       });
   
+      console.log("Login response:", res.data);
+      console.log("Token in response:", res.data.token);
+  
       if (res.status === 200 || res.status === 201) {
         dispatch(authSlice.actions.loginSuccess(res.data));
       } else {
         dispatch(authSlice.actions.loginFailed("Unexpected response from server"));
       }
     } catch (error) {
+      console.error("Login error:", error);
       dispatch(authSlice.actions.loginFailed(error.response?.data?.message || "Login failed"));
     }
   };
