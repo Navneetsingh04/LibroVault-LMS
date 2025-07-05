@@ -47,11 +47,12 @@ const UserDashboard = () => {
 
     let totalBorrowed = 0;
     let totalReturned = 0;
-    userBorrowedBooks?.forEach((book) => {
-      if (book.returnDate === null) {
-        totalBorrowed++;
-      } else {
+    
+    userBorrowedBooks.forEach((book) => {
+      if (book.returned === true) {
         totalReturned++;
+      } else {
+        totalBorrowed++;
       }
     });
     setTotalBorrowedBooks(totalBorrowed);
