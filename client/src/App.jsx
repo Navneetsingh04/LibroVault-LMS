@@ -8,7 +8,7 @@ import OTP from "./pages/OTP";
 import ResetPassword from "./pages/ResetPassword";
 import { ToastContainer } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { getUser, initializeApp } from "./store/slices/authSlice";
+import { getUser } from "./store/slices/authSlice";
 import { fetchAllUsers } from "./store/slices/userSlice";
 import { fetchAllBooks } from "./store/slices/bookSlice";
 import {
@@ -18,27 +18,11 @@ import {
 
 const AppContent = () => {
   const location = useLocation();
-  const { user, isAuthenticated, loading, initialized } = useSelector((state) => state.auth);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const publicRoutes = ["/login", "/register", "/password/forgot", "/password/reset"];
   const isPublicRoute = publicRoutes.some((route) => location.pathname.startsWith(route));
-
-  // Initialize app on startup
-  useEffect(() => {
-    if (!initialized) {
-      dispatch(initializeApp());
-    }
-  }, [dispatch, initialized]);
-
-  // Don't render anything until app is initialized
-  if (!initialized) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
 
   useEffect(() => {
     if (isAuthenticated && user) {
