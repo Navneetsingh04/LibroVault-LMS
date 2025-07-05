@@ -2,6 +2,29 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleRecordBookPopup } from "./popUpSlice";
 
+// Utility to parse error messages consistently
+const parseError = (error, defaultMessage) => {
+  if (error.response) {
+    if (error.response.status === 401) {
+      // Clear any stored auth data
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+      // Dispatch logout action if needed (you might want to import logout action)
+      // dispatch(logout()); // Uncomment if you have access to logout action
+      return "Session expired. Please log in again.";
+    }
+    if (error.response.status === 403) return "Forbidden. You don't have permission to perform this action.";
+    if (error.response.status === 404) return "Resource not found.";
+    if (error.response.status === 409) return "Conflict. This book may already be borrowed or returned.";
+    if (error.response.status >= 500) return "Server error. Please try again later.";
+    return error.response.data?.message || defaultMessage;
+  }
+  if (error.request) {
+    return "Network error. Please check your connection.";
+  }
+  return defaultMessage;
+};
+
 const borrowSlice = createSlice({
   name: "borrow",
   initialState: {
@@ -24,6 +47,7 @@ const borrowSlice = createSlice({
     fetchBorrowingsFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      state.message = null;
     },
 
     recordBookRequest: (state) => {
@@ -53,6 +77,7 @@ const borrowSlice = createSlice({
     fetchAllBorrowingsFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      state.message = null;
     },
 
     returnBookRequest: (state) => {
@@ -74,6 +99,12 @@ const borrowSlice = createSlice({
       state.error = null;
       state.message = null;
     },
+    // Add action to handle authentication errors specifically
+    authenticationError: (state) => {
+      state.loading = false;
+      state.error = "Authentication required. Please log in.";
+      state.message = null;
+    },
   },
 });
 
@@ -82,17 +113,26 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
   try {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/my-borrowed-books",
-      { withCredentials: true }
+      { 
+        withCredentials: true,
+        timeout: 30000, // 30 second timeout
+      }
     );
     dispatch(
       borrowSlice.actions.fetchBorrowingsSuccess(response.data.borrowedBooks)
     );
   } catch (error) {
-    dispatch(
-      borrowSlice.actions.fetchBorrowingsFailure(
-        error.response?.data?.message || error.message
-      )
-    );
+    console.error("Fetch user borrowed books error:", error);
+    const message = parseError(error, "Failed to fetch your borrowed books.");
+    
+    // Handle 401 errors specifically
+    if (error.response?.status === 401) {
+      dispatch(borrowSlice.actions.authenticationError());
+      // You might want to redirect to login page here
+      // window.location.href = '/login';
+    } else {
+      dispatch(borrowSlice.actions.fetchBorrowingsFailure(message));
+    }
   }
 };
 
@@ -101,7 +141,10 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
   try {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/borrowed-books-by-users",
-      { withCredentials: true }
+      { 
+        withCredentials: true,
+        timeout: 30000, // 30 second timeout
+      }
     );
     dispatch(
       borrowSlice.actions.fetchAllBorrowingsSuccess(
@@ -109,11 +152,15 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
       )
     );
   } catch (error) {
-    dispatch(
-      borrowSlice.actions.fetchAllBorrowingsFailure(
-        error.response?.data?.message || error.message
-      )
-    );
+    console.error("Fetch all borrowed books error:", error);
+    const message = parseError(error, "Failed to fetch all borrowed books.");
+    
+    // Handle 401 errors specifically
+    if (error.response?.status === 401) {
+      dispatch(borrowSlice.actions.authenticationError());
+    } else {
+      dispatch(borrowSlice.actions.fetchAllBorrowingsFailure(message));
+    }
   }
 };
 
@@ -128,6 +175,7 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
         headers: {
           "Content-Type": "application/json",
         },
+        timeout: 30000, // 30 second timeout
       }
     );
     dispatch(
@@ -137,11 +185,15 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
     );
     dispatch(toggleRecordBookPopup());
   } catch (error) {
-    dispatch(
-      borrowSlice.actions.recordBookFailure(
-        error.response?.data?.message || error.message
-      )
-    );
+    console.error("Record borrowed book error:", error);
+    const message = parseError(error, "Failed to record borrowed book.");
+    
+    // Handle 401 errors specifically
+    if (error.response?.status === 401) {
+      dispatch(borrowSlice.actions.authenticationError());
+    } else {
+      dispatch(borrowSlice.actions.recordBookFailure(message));
+    }
   }
 };
 
@@ -156,6 +208,7 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
         headers: {
           "Content-Type": "application/json",
         },
+        timeout: 30000, // 30 second timeout
       }
     );
     dispatch(
@@ -164,11 +217,15 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
       })
     );
   } catch (error) {
-    dispatch(
-      borrowSlice.actions.returnBookFailure(
-        error.response?.data?.message || error.message
-      )
-    );
+    console.error("Return borrowed book error:", error);
+    const message = parseError(error, "Failed to return borrowed book.");
+    
+    // Handle 401 errors specifically
+    if (error.response?.status === 401) {
+      dispatch(borrowSlice.actions.authenticationError());
+    } else {
+      dispatch(borrowSlice.actions.returnBookFailure(message));
+    }
   }
 };
 

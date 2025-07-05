@@ -115,7 +115,7 @@ const authSlice = createSlice({
             state.user = action.payload.user;
             state.isAuthenticated = true;
         },
-        resetPasswordFailed(state){
+        resetPasswordFailed(state, action){
             state.loading = false;
             state.error = action.payload;
         },
@@ -248,7 +248,7 @@ export const forgotPassword = (email) => async (dispatch) => {
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.forgotPasswordSuccess(res.data.message)); 
         } else {
-            dispatch(authSlice.actions.forgotPasswordFailed(error.response?.data?.message || "Unexpected response from server"));
+            dispatch(authSlice.actions.forgotPasswordFailed(res.response?.data?.message || "Unexpected response from server"));
         }
     } catch (error) {
         dispatch(authSlice.actions.forgotPasswordFailed(error.response?.data?.message || "Password recovery request failed"));
@@ -267,7 +267,7 @@ export const resetPassword = (data, token) => async (dispatch) => {
         });
 
         if (res.status === 200 || res.status === 201) {
-            dispatch(authSlice.actions.resetPasswordSuccess(res.data.message));
+            dispatch(authSlice.actions.resetPasswordSuccess(res.data));
         } else {
             dispatch(authSlice.actions.resetPasswordFailed("Unexpected response from server"));
         }

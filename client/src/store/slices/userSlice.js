@@ -3,68 +3,141 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { toggleAddNewAdminPopup } from "./popUpSlice";
 
+const parseError = (error, defaultMessage) => {
+  if (error.response) {
+    if (error.response.status === 401) {
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+      return "Session expired. Please log in again.";
+    }
+    if (error.response.status === 403) return "Forbidden. You don't have permission.";
+    if (error.response.status === 404) return "Resource not found.";
+    if (error.response.status >= 500) return "Server error. Please try again later.";
+    return error.response.data?.message || defaultMessage;
+  }
+  if (error.request) {
+    return "Network error. Please check your connection.";
+  }
+  return defaultMessage;
+};
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
     users: [],
     loading: false,
+    error: null,
+    message: null,
   },
   reducers: {
     fetchAllUsersRequest: (state) => {
       state.loading = true;
+      state.error = null;
+      state.message = null;
     },
     fetchAllUsersSuccess: (state, action) => {
       state.loading = false;
       state.users = action.payload;
+      state.error = null;
     },
     fetchAllUsersFailure: (state, action) => {
       state.loading = false;
-      toast.error(action.payload);
+      state.error = action.payload;
+      state.message = null;
     },
     addNewAdminRequest: (state) => {
       state.loading = true;
+      state.error = null;
+      state.message = null;
     },
     addNewAdminSuccess: (state, action) => {
       state.loading = false;
-      toast.success("Admin Added Successfully");
       state.users.push(action.payload);
+      state.message = "Admin added successfully";
+      state.error = null;
     },
     addNewAdminFailure: (state, action) => {
       state.loading = false;
-      toast.error(action.payload);
+      state.error = action.payload;
+      state.message = null;
+    },
+    resetUserSlice: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.message = null;
+    },
+    authenticationError: (state) => {
+      state.loading = false;
+      state.error = "Authentication required. Please log in.";
+      state.message = null;
     },
   },
 });
 
 export const fetchAllUsers = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchAllUsersRequest());
-  await axios
-    .get("https://librovault.onrender.com/api/v1/user/all",{withCredentials: true})
-    .then((res) => {
-      dispatch(userSlice.actions.fetchAllUsersSuccess(res.data.users));
-    })
-    .catch((err) => {
-      dispatch(userSlice.actions.fetchAllUsersFailure(err.response.data.message));
-    });
+  try {
+    const response = await axios.get(
+      "https://librovault.onrender.com/api/v1/user/all",
+      { 
+        withCredentials: true,
+        timeout: 30000,
+      }
+    );
+    dispatch(userSlice.actions.fetchAllUsersSuccess(response.data.users));
+  } catch (error) {
+    console.error("Fetch users error:", error);
+    const message = parseError(error, "Failed to fetch users.");
+    
+    if (error.response?.status === 401) {
+      dispatch(userSlice.actions.authenticationError());
+      toast.error("Session expired. Please log in again.");
+    } else {
+      dispatch(userSlice.actions.fetchAllUsersFailure(message));
+      toast.error(message);
+    }
+  }
 };
 
 export const addNewAdmin = (data) => async (dispatch) => {
+  if (!data) {
+    toast.error("Admin data is required");
+    dispatch(userSlice.actions.addNewAdminFailure("Admin data is required"));
+    return;
+  }
+
   dispatch(userSlice.actions.addNewAdminRequest());
-  await axios
-    .post("https://librovault.onrender.com/api/v1/user/add/new-admin", data, {withCredentials: true,
+  try {
+    const response = await axios.post(
+      "https://librovault.onrender.com/api/v1/user/add/new-admin", 
+      data, 
+      {
+        withCredentials: true,
         headers: {
-            "Content-Type": "multipart/form-data",
+          "Content-Type": "multipart/form-data",
         },
-    })
-    .then((res) => {
-      dispatch(userSlice.actions.addNewAdminSuccess(res.data.user));
-        toast.success("Admin Added Successfully");
-        dispatch(toggleAddNewAdminPopup())
-    })
-    .catch((err) => {
-      dispatch(userSlice.actions.addNewAdminFailure(err.response.data.message));
-        toast.error(err.response.data.message);
-    });
+        timeout: 30000,
+      }
+    );
+    dispatch(userSlice.actions.addNewAdminSuccess(response.data.user));
+    toast.success("Admin Added Successfully");
+    dispatch(toggleAddNewAdminPopup());
+  } catch (error) {
+    console.error("Add admin error:", error);
+    const message = parseError(error, "Failed to add admin.");
+    
+    if (error.response?.status === 401) {
+      dispatch(userSlice.actions.authenticationError());
+      toast.error("Session expired. Please log in again.");
+    } else {
+      dispatch(userSlice.actions.addNewAdminFailure(message));
+      toast.error(message);
+    }
+  }
+};
+
+export const resetUserSlice = () => (dispatch) => {
+  dispatch(userSlice.actions.resetUserSlice());
 };
 
 export default userSlice.reducer;

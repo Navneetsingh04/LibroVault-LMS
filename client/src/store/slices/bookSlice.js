@@ -5,8 +5,19 @@ import { toggleAddBookPopup } from "./popUpSlice";
 // Utility to parse error messages consistently
 const parseError = (error, defaultMessage) => {
   if (error.response) {
-    if (error.response.status === 401) return "Unauthorized. Please log in.";
+    if (error.response.status === 401) {
+      // Clear any stored auth data and redirect to login
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
+      return "Unauthorized. Please log in.";
+    }
+    if (error.response.status === 403) return "Forbidden. You don't have permission.";
+    if (error.response.status === 404) return "Resource not found.";
+    if (error.response.status >= 500) return "Server error. Please try again later.";
     return error.response.data?.message || defaultMessage;
+  }
+  if (error.request) {
+    return "Network error. Please check your connection.";
   }
   return defaultMessage;
 };
@@ -49,6 +60,7 @@ const bookSlice = createSlice({
     addBookFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
+      state.message = null;
     },
     deleteBookRequest: (state) => {
       state.loading = true;
@@ -82,6 +94,7 @@ export const fetchAllBooks = () => async (dispatch) => {
   try {
     const response = await axios.get("https://librovault.onrender.com/api/v1/book/all", {
       withCredentials: true,
+      timeout: 30000, // 30 second timeout
     });
     dispatch(bookSlice.actions.fetchBooksSuccess(response.data.books));
   } catch (error) {
@@ -94,14 +107,19 @@ export const fetchAllBooks = () => async (dispatch) => {
 export const addBook = (bookData) => async (dispatch) => {
   dispatch(bookSlice.actions.addBookRequest());
   try {
+    // Determine content type based on data type
+    const isFormData = bookData instanceof FormData;
+    const headers = isFormData 
+      ? {} // Let axios set Content-Type for FormData automatically
+      : { "Content-Type": "application/json" };
+
     const response = await axios.post(
       "https://librovault.onrender.com/api/v1/book/admin/add",
       bookData,
       {
         withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
+        timeout: 30000, // 30 second timeout
       }
     );
     dispatch(
@@ -125,6 +143,7 @@ export const deleteBook = (bookId) => async (dispatch) => {
       `https://librovault.onrender.com/api/v1/book/delete/${bookId}`,
       {
         withCredentials: true,
+        timeout: 30000, // 30 second timeout
       }
     );
     dispatch(
