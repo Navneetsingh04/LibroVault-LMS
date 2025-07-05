@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { toggleAddNewAdminPopup } from "./popUpSlice";
 
+// Utility to parse error messages consistently
 const parseError = (error, defaultMessage) => {
   if (error.response) {
     if (error.response.status === 401) {
@@ -16,6 +17,13 @@ const parseError = (error, defaultMessage) => {
     return error.response.data?.message || defaultMessage;
   }
   if (error.request) {
+    // Check for CORS errors
+    if (error.message && error.message.includes('CORS')) {
+      return "CORS error. Please contact support.";
+    }
+    if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+      return "Network error. Please check your connection or try again later.";
+    }
     return "Network error. Please check your connection.";
   }
   return defaultMessage;

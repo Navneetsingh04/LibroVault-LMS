@@ -21,14 +21,64 @@ const __dirname = path.dirname(__filename);
 export const app = express();
 
 config({ path: "./config/config.env" }); 
+
+// Debug: Log the frontend URL to ensure it's being read correctly
+console.log("Frontend URL:", process.env.FRONTEND_URL);
+console.log("Environment:", process.env.NODE_ENV);
+
+// More robust CORS configuration
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "DELETE", "PUT"],
+    origin: [
+      process.env.FRONTEND_URL,
+      "https://librovault.vercel.app",
+      "http://localhost:5173", // for local development
+      "http://localhost:3000", // for local development
+    ],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
     credentials: true,
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ],
+    exposedHeaders: ["Set-Cookie"],
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
   })
 );
 
+// Handle preflight requests explicitly
+app.options('*', cors());
+
+// Additional middleware to ensure CORS headers are set
+app.use((req, res, next) => {
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "https://librovault.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000"
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.setHeader('Access-Control-Expose-Headers', 'Set-Cookie');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.json());
