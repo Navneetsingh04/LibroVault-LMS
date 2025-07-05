@@ -51,7 +51,6 @@ const UserDashboard = () => {
       totalReturned++;
     }
   });
-
   setTotalBorrowedBooks(totalBorrowed);
   setTotalReturnedBooks(totalReturned);
 }, [userBorrowedBooks]);
