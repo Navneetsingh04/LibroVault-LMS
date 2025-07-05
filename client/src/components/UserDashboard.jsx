@@ -39,25 +39,32 @@ const UserDashboard = () => {
   const [totalReturnedBooks, setTotalReturnedBooks] = useState(0);
 
   useEffect(() => {
-  if (!userBorrowedBooks || userBorrowedBooks.length === 0) return;
-
-  let totalBorrowed = 0;
-  let totalReturned = 0;
-
-  userBorrowedBooks.forEach((book) => {
-    if (!book.returnDate) {
-      totalBorrowed++;
-    } else {
-      totalReturned++;
+    if (!userBorrowedBooks || userBorrowedBooks.length === 0) {
+      setTotalBorrowedBooks(0);
+      setTotalReturnedBooks(0);
+      return;
     }
-  });
-  setTotalBorrowedBooks(totalBorrowed);
-  setTotalReturnedBooks(totalReturned);
-}, [userBorrowedBooks]);
+
+    let currentlyBorrowedCount = 0;
+    let returnedCount = 0;
+
+    userBorrowedBooks.forEach((book) => {
+      if (!book.returnDate) {
+        // Book is currently borrowed (not returned yet)
+        currentlyBorrowedCount++;
+      } else {
+        // Book has been returned
+        returnedCount++;
+      }
+    });
+
+    setTotalBorrowedBooks(currentlyBorrowedCount);
+    setTotalReturnedBooks(returnedCount);
+  }, [userBorrowedBooks]);
 
 
   const data = {
-    labels: ["Total Borrowed Books", "Total Returned Books"],
+    labels: ["Currently Borrowed", "Books Returned"],
     datasets: [
       {
         label: "Books",
@@ -88,7 +95,7 @@ const UserDashboard = () => {
                   <span className="w-px bg-gray-200 self-stretch"></span>
                   <div className="flex-1 flex flex-col items-center">
                     <h4 className="font-bold text-xl sm:text-2xl text-gray-800">{totalBorrowedBooks}</h4>
-                    <p className="text-gray-600 text-xs sm:text-sm">Total Borrowed Books</p>
+                    <p className="text-gray-600 text-xs sm:text-sm">Currently Borrowed</p>
                   </div>
                 </div>
                 
@@ -100,7 +107,7 @@ const UserDashboard = () => {
                   <span className="w-px bg-gray-200 self-stretch"></span>
                   <div className="flex-1 flex flex-col items-center">
                     <h4 className="font-bold text-xl sm:text-2xl text-gray-800">{totalReturnedBooks}</h4>
-                    <p className="text-gray-600 text-xs sm:text-sm">Total Returned Books</p>
+                    <p className="text-gray-600 text-xs sm:text-sm">Books Returned</p>
                   </div>
                 </div>
                 
@@ -178,7 +185,7 @@ const UserDashboard = () => {
               <div className="flex justify-center gap-4 md:gap-8 mt-4 md:mt-6">
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#4F46E5]"></span>
-                  <span className="text-xs sm:text-sm font-medium">Borrowed ({totalBorrowedBooks})</span>
+                  <span className="text-xs sm:text-sm font-medium">Currently Borrowed ({totalBorrowedBooks})</span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#10B981]"></span>

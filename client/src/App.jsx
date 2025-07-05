@@ -18,11 +18,20 @@ import {
 
 const AppContent = () => {
   const location = useLocation();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const publicRoutes = ["/login", "/register", "/password/forgot", "/password/reset"];
   const isPublicRoute = publicRoutes.some((route) => location.pathname.startsWith(route));
+
+  // Check for existing authentication on app start
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token && !isAuthenticated && !user && !loading) {
+      // Only try to get user if we have a token but no current auth state and not already loading
+      dispatch(getUser());
+    }
+  }, [dispatch, isAuthenticated, user, loading]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -38,6 +47,15 @@ const AppContent = () => {
       }
     }
   }, [isAuthenticated, user, dispatch]);
+
+  // Show loading while checking authentication status
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <>
