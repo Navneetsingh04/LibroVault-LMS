@@ -45,26 +45,21 @@ const UserDashboard = () => {
       return;
     }
 
-    let currentlyBorrowedCount = 0;
-    let returnedCount = 0;
-
-    userBorrowedBooks.forEach((book) => {
-      if (!book.returnDate) {
-        // Book is currently borrowed (not returned yet)
-        currentlyBorrowedCount++;
+    let totalBorrowed = 0;
+    let totalReturned = 0;
+    userBorrowedBooks?.forEach((book) => {
+      if (book.returnDate === null) {
+        totalBorrowed++;
       } else {
-        // Book has been returned
-        returnedCount++;
+        totalReturned++;
       }
     });
-
-    setTotalBorrowedBooks(currentlyBorrowedCount);
-    setTotalReturnedBooks(returnedCount);
+    setTotalBorrowedBooks(totalBorrowed);
+    setTotalReturnedBooks(totalReturned);
   }, [userBorrowedBooks]);
 
-
   const data = {
-    labels: ["Currently Borrowed", "Books Returned"],
+    labels: ["Borrowed", "Returned"],
     datasets: [
       {
         label: "Books",
@@ -82,49 +77,63 @@ const UserDashboard = () => {
       <main className="relative flex-1 p-3 sm:p-4 md:p-6 pt-20 md:pt-28">
         <Header />
         <div className="flex flex-col xl:flex-row gap-4 md:gap-6">
-          {/* Left Side */}
           <div className="w-full xl:w-2/3 flex flex-col gap-4 md:gap-6 order-2 xl:order-1">
             <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
-              {/* Stat Cards */}
               <div className="w-full sm:w-1/2 flex flex-col gap-4">
-                {/* Borrowed Book Card */}
                 <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
                   <div className="bg-indigo-50 h-12 w-12 sm:h-16 sm:w-16 flex justify-center items-center rounded-lg">
-                    <img src={bookIcon} alt="Books icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <img
+                      src={bookIcon}
+                      alt="Books icon"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
+                    />
                   </div>
                   <span className="w-px bg-gray-200 self-stretch"></span>
                   <div className="flex-1 flex flex-col items-center">
-                    <h4 className="font-bold text-xl sm:text-2xl text-gray-800">{totalBorrowedBooks}</h4>
-                    <p className="text-gray-600 text-xs sm:text-sm">Currently Borrowed</p>
+                    <h4 className="font-bold text-xl sm:text-2xl text-gray-800">
+                      {totalBorrowedBooks}
+                    </h4>
+                    <p className="text-gray-600 text-xs sm:text-sm">Borrowed</p>
                   </div>
                 </div>
-                
-                {/* Returned Book Card */}
+
                 <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
                   <div className="bg-green-50 h-12 w-12 sm:h-16 sm:w-16 flex justify-center items-center rounded-lg">
-                    <img src={returnIcon} alt="Return icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <img
+                      src={returnIcon}
+                      alt="Return icon"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
+                    />
                   </div>
                   <span className="w-px bg-gray-200 self-stretch"></span>
                   <div className="flex-1 flex flex-col items-center">
-                    <h4 className="font-bold text-xl sm:text-2xl text-gray-800">{totalReturnedBooks}</h4>
-                    <p className="text-gray-600 text-xs sm:text-sm">Books Returned</p>
+                    <h4 className="font-bold text-xl sm:text-2xl text-gray-800">
+                      {totalReturnedBooks}
+                    </h4>
+                    <p className="text-gray-600 text-xs sm:text-sm">Returned</p>
                   </div>
                 </div>
-                
-                {/* Browse Books Card */}
+
                 <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
                   <div className="bg-purple-50 h-12 w-12 sm:h-16 sm:w-16 flex justify-center items-center rounded-lg">
-                    <img src={browseIcon} alt="Browse icon" className="w-6 h-6 sm:w-8 sm:h-8" />
+                    <img
+                      src={browseIcon}
+                      alt="Browse icon"
+                      className="w-6 h-6 sm:w-8 sm:h-8"
+                    />
                   </div>
                   <span className="w-px bg-gray-200 self-stretch"></span>
                   <div className="flex-1 flex flex-col items-center text-center">
-                    <p className="text-gray-800 font-medium">Browse Book Inventory</p>
-                    <p className="text-gray-600 text-xs sm:text-sm">Explore available books</p>
+                    <p className="text-gray-800 font-medium">
+                      Browse Book Inventory
+                    </p>
+                    <p className="text-gray-600 text-xs sm:text-sm">
+                      Explore available books
+                    </p>
                   </div>
                 </div>
               </div>
-              
-              {/* User Profile (Right Side) */}
+
               <div className="w-full sm:w-1/2">
                 <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-full">
                   <div className="flex flex-col items-center">
@@ -142,14 +151,14 @@ const UserDashboard = () => {
                       Digital Library Management
                     </p>
                     <p className="text-gray-600 text-xs sm:text-sm text-center max-w-xs">
-                      Access your borrowed books, return history, and browse our extensive collection.
+                      Access your borrowed books, return history, and browse our
+                      extensive collection.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Quote - Hidden on small screens, shown on xl screens */}
+
             <div className="bg-white rounded-xl shadow-sm p-6 md:p-8 hidden lg:block">
               <blockquote className="text-lg md:text-xl xl:text-2xl font-medium text-center italic text-gray-800">
                 "Embarking on the journey of reading fosters personal growth,
@@ -161,23 +170,24 @@ const UserDashboard = () => {
               </blockquote>
             </div>
           </div>
-          
-          {/* Right Side */}
+
           <div className="w-full xl:w-1/3 flex flex-col gap-4 md:gap-6 bg-gray-50 p-4 md:p-6 rounded-xl order-1 xl:order-2">
             <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
-              <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4 text-gray-800">Book Statistics</h3>
+              <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4 text-gray-800">
+                Book Statistics
+              </h3>
               <div className="relative h-48 sm:h-56 md:h-64">
                 <Pie
                   data={data}
-                  options={{ 
+                  options={{
                     cutout: 0,
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                       legend: {
-                        display: false
-                      }
-                    }
+                        display: false,
+                      },
+                    },
                   }}
                   className="mx-auto w-full"
                 />
@@ -185,14 +195,19 @@ const UserDashboard = () => {
               <div className="flex justify-center gap-4 md:gap-8 mt-4 md:mt-6">
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#4F46E5]"></span>
-                  <span className="text-xs sm:text-sm font-medium">Currently Borrowed ({totalBorrowedBooks})</span>
+                  <span className="text-xs sm:text-sm font-medium">
+                    Borrowed ({totalBorrowedBooks})
+                  </span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full bg-[#10B981]"></span>
-                  <span className="text-xs sm:text-sm font-medium">Returned ({totalReturnedBooks})</span>
+                  <span className="text-xs sm:text-sm font-medium">
+                    Returned ({totalReturnedBooks})
+                  </span>
                 </p>
               </div>
             </div>
+
             <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 flex items-center gap-3 md:gap-4">
               <img
                 src={logo}
@@ -200,12 +215,15 @@ const UserDashboard = () => {
                 className="h-8 sm:h-10 md:h-12 w-auto"
               />
               <div>
-                <h3 className="font-semibold text-sm sm:text-base">LibroVault Library</h3>
-                <p className="text-xs sm:text-sm text-gray-600">Digital Management System</p>
+                <h3 className="font-semibold text-sm sm:text-base">
+                  LibroVault Library
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  Digital Management System
+                </p>
               </div>
             </div>
-            
-            {/* Quote - Only visible on small screens up to lg */}
+
             <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 block lg:hidden">
               <blockquote className="text-sm sm:text-base font-medium text-center italic text-gray-800">
                 "Embarking on the journey of reading fosters personal growth,
