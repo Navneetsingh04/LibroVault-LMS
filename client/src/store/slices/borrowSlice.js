@@ -2,6 +2,16 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleRecordBookPopup } from "./popUpSlice";
 
+// Helper function to create headers (cookie-based auth)
+const getRequestConfig = () => {
+  return {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+};
+
 const borrowSlice = createSlice({
   name: "borrow",
   initialState: {
@@ -82,12 +92,18 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
   try {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/my-borrowed-books",
-      { withCredentials: true }
+      getRequestConfig()
     );
     dispatch(
       borrowSlice.actions.fetchBorrowingsSuccess(response.data.borrowedBooks)
     );
   } catch (error) {
+    // Handle 401 specifically for cookie auth
+    if (error.response?.status === 401) {
+      // Redirect to login for re-authentication
+      window.location.href = '/login';
+      return;
+    }
     dispatch(
       borrowSlice.actions.fetchBorrowingsFailure(
         error.response?.data?.message || error.message
@@ -101,7 +117,10 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
   try {
     const response = await axios.get(
       "https://librovault.onrender.com/api/v1/borrow/borrowed-books-by-users",
-      { withCredentials: true }
+      {
+        headers: getAuthHeaders(),
+        withCredentials: true
+      }
     );
     dispatch(
       borrowSlice.actions.fetchAllBorrowingsSuccess(
@@ -109,6 +128,12 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
       )
     );
   } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      window.location.href = '/login';
+      return;
+    }
     dispatch(
       borrowSlice.actions.fetchAllBorrowingsFailure(
         error.response?.data?.message || error.message
@@ -124,10 +149,8 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
       `https://librovault.onrender.com/api/v1/borrow/record-borrow-book/${id}`,
       { email },
       {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
+        withCredentials: true
       }
     );
     dispatch(
@@ -137,6 +160,12 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
     );
     dispatch(toggleRecordBookPopup());
   } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      window.location.href = '/login';
+      return;
+    }
     dispatch(
       borrowSlice.actions.recordBookFailure(
         error.response?.data?.message || error.message
@@ -152,10 +181,8 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
       `https://librovault.onrender.com/api/v1/borrow/return-borrowed-book/${id}`,
       { email },
       {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
+        withCredentials: true
       }
     );
     dispatch(
@@ -164,6 +191,12 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
       })
     );
   } catch (error) {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      window.location.href = '/login';
+      return;
+    }
     dispatch(
       borrowSlice.actions.returnBookFailure(
         error.response?.data?.message || error.message
