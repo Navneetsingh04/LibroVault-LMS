@@ -183,7 +183,7 @@ npm run dev
 
 The application will be available at:
 - Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:4000`
+- Backend API: `https://librovault.onrender.com0`
 
 ## 🎮 Usage
 

@@ -81,7 +81,7 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
   dispatch(borrowSlice.actions.fetchBorrowingsRequest());
   try {
     const response = await axios.get(
-      "http://localhost:4000/api/v1/borrow/my-borrowed-books",
+      "https://librovault.onrender.com/api/v1/borrow/my-borrowed-books",
       { withCredentials: true }
     );
     dispatch(
@@ -100,7 +100,7 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
   dispatch(borrowSlice.actions.fetchAllBorrowingsRequest());
   try {
     const response = await axios.get(
-      "http://localhost:4000/api/v1/borrow/borrowed-books-by-users",
+      "https://librovault.onrender.com/api/v1/borrow/borrowed-books-by-users",
       { withCredentials: true }
     );
     dispatch(
@@ -121,7 +121,7 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
   dispatch(borrowSlice.actions.recordBookRequest());
   try {
     const response = await axios.post(
-      `http://localhost:4000/api/v1/borrow/record-borrow-book/${id}`,
+      `https://librovault.onrender.com/api/v1/borrow/record-borrow-book/${id}`,
       { email },
       {
         withCredentials: true,
@@ -149,7 +149,7 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
   dispatch(borrowSlice.actions.returnBookRequest());
   try {
     const response = await axios.put(
-      `http://localhost:4000/api/v1/borrow/return-borrowed-book/${id}`,
+      `https://librovault.onrender.com/api/v1/borrow/return-borrowed-book/${id}`,
       { email },
       {
         withCredentials: true,
