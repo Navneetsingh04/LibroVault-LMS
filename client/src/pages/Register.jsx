@@ -32,8 +32,9 @@ const Register = () => {
   };
 
   useEffect(() => {
-    if (message) {
+    if (message?.includes("Verification code") && email) {
       navigateTo(`/otp-verification/${email}`)
+      console.log("Registration successful:", message);
     }
     if (error) {
       toast.error(error);

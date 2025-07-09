@@ -29,7 +29,7 @@ const OTP = () => {
       toast.error(error);
       dispatch(resetSlice());
     }
-  }, [dispatch, isAuthenticated, error, loading]);
+  }, [dispatch,message, isAuthenticated, error, loading]);
 
   if (isAuthenticated) {
     return <Navigate to={"/"} />;
