@@ -34,26 +34,49 @@ const Register = () => {
       return;
     }
     
-    // Use a regular JSON object instead of FormData
+    // Clean and prepare data
+    const cleanedEmail = email.trim().toLowerCase();
     const userData = {
       name: name.trim(),
-      email: email.trim().toLowerCase(),
+      email: cleanedEmail,
       password
     };
     
     console.log("Registering user with data:", { name: userData.name, email: userData.email });
+    
+    // Store cleaned email for navigation
+    setEmail(cleanedEmail);
     dispatch(register(userData));
   };
 
   useEffect(() => {
     if (message) {
       console.log("Registration successful, navigating to OTP page");
+      console.log("Email for navigation:", email);
       toast.success(message);
+      
       // Small delay to ensure toast is shown before navigation
-      setTimeout(() => {
-        navigateTo(`/otp-verification/${email}`);
-        dispatch(resetSlice());
-      }, 500);
+      const timer = setTimeout(() => {
+        try {
+          const encodedEmail = encodeURIComponent(email);
+          console.log("Navigating to:", `/otp-verification/${encodedEmail}`);
+          navigateTo(`/otp-verification/${encodedEmail}`);
+          dispatch(resetSlice());
+        } catch (navError) {
+          console.error("Navigation error:", navError);
+          // Fallback: try without encoding
+          try {
+            navigateTo(`/otp-verification/${email}`);
+            dispatch(resetSlice());
+          } catch (fallbackError) {
+            console.error("Fallback navigation also failed:", fallbackError);
+            toast.error("Navigation error. Please manually go to OTP verification page.");
+          }
+        }
+      }, 1000); // Increased delay slightly
+      
+      // Cleanup timer
+      return () => clearTimeout(timer);
     }
     if (error) {
       console.error("Registration error:", error);
