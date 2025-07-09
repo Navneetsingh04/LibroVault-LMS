@@ -10,6 +10,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [registrationEmail, setRegistrationEmail] = useState(""); // Store email for navigation
 
   const dispatch = useDispatch();
   const { loading, error, message, user, isAuthenticated } = useSelector(
@@ -45,20 +46,20 @@ const Register = () => {
     console.log("Registering user with data:", { name: userData.name, email: userData.email });
     
     // Store cleaned email for navigation
-    setEmail(cleanedEmail);
+    setRegistrationEmail(cleanedEmail);
     dispatch(register(userData));
   };
 
   useEffect(() => {
-    if (message) {
+    if (message && registrationEmail) {
       console.log("Registration successful, navigating to OTP page");
-      console.log("Email for navigation:", email);
+      console.log("Email for navigation:", registrationEmail);
       toast.success(message);
       
       // Small delay to ensure toast is shown before navigation
       const timer = setTimeout(() => {
         try {
-          const encodedEmail = encodeURIComponent(email);
+          const encodedEmail = encodeURIComponent(registrationEmail);
           console.log("Navigating to:", `/otp-verification/${encodedEmail}`);
           navigateTo(`/otp-verification/${encodedEmail}`);
           dispatch(resetSlice());
@@ -66,7 +67,7 @@ const Register = () => {
           console.error("Navigation error:", navError);
           // Fallback: try without encoding
           try {
-            navigateTo(`/otp-verification/${email}`);
+            navigateTo(`/otp-verification/${registrationEmail}`);
             dispatch(resetSlice());
           } catch (fallbackError) {
             console.error("Fallback navigation also failed:", fallbackError);
@@ -83,7 +84,7 @@ const Register = () => {
       toast.error(error);
       dispatch(resetSlice());
     }
-  }, [dispatch, error, message, navigateTo, email]);
+  }, [dispatch, error, message, navigateTo, registrationEmail]);
 
   if (isAuthenticated) {
     return <Navigate to={"/"} />;
