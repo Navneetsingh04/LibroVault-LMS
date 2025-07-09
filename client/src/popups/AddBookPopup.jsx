@@ -38,82 +38,106 @@ const AddBookPopup = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 p-3 sm:p-5 flex items-center justify-center z-50">
-      <div className="w-full sm:w-1/2 md:w-1/2 bg-white rounded-lg shadow-lg">
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-4">Record Book</h3>
-          <form onSubmit={handleAddBook}>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Book Title</label>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center z-50">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">Add New Book</h3>
+            <button
+              type="button"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              onClick={() => dispatch(toggleAddBookPopup())}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <form onSubmit={handleAddBook} className="space-y-5">
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Book Title</label>
               <input
                 type="text"
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Book title"
-                className="w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none"
+                placeholder="Enter book title"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Book Author</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Book Author</label>
               <input
                 type="text"
                 id="author"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
-                placeholder="Book Author"
-                className="w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none"
+                placeholder="Enter author name"
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Book Price (for borrowing)</label>
-              <input
-                type="number"
-                id="price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Book Price"
-                className="w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none"
-                required
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="block text-sm font-semibold text-gray-700">Book Price (₹)</label>
+                <input
+                  type="number"
+                  id="price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="block text-sm font-semibold text-gray-700">Book Quantity</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="0"
+                  min="1"
+                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  required
+                />
+              </div>
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Book Quantity</label>
-              <input
-                type="number"
-                id="quantity"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                placeholder="Book Quantity"
-                className="w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 font-medium mb-2">Book Description</label>
+            <div className="space-y-1">
+              <label className="block text-sm font-semibold text-gray-700">Book Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Book Description"
-                className="w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none"
+                placeholder="Enter book description..."
+                className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
                 required
                 rows="4"
-                cols="50"
                 maxLength="500"
               />
+              <div className="text-right text-xs text-gray-500">
+                {description.length}/500 characters
+              </div>
             </div>
-            <button type="submit" className="bg-black text-white px-4 py-2 rounded cursor-pointer">
-              Add Book
-            </button>
-            <button
-              type="button"
-              className="bg-gray-200 text-black px-4 py-2 rounded hover:bg-gray-300 transition duration-200 ml-2 cursor-pointer"
-              onClick={() => dispatch(toggleAddBookPopup())}
-            >
-              Close
-            </button>
+            
+            <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
+              <button
+                type="button"
+                className="w-full sm:w-auto px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                onClick={() => dispatch(toggleAddBookPopup())}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="px-3 sm:px-4 py-2 bg-black rounded-md text-white hover:bg-gray-800 text-sm sm:text-base cursor-pointer"
+              >
+                Add Book
+              </button>
+            </div>
           </form>
         </div>
       </div>

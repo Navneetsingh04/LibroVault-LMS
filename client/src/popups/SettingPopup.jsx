@@ -50,9 +50,9 @@ const SettingPopup = () => {
 
           <form onSubmit={handleUpdatePassword}>
             <div className="mb-4 sm:flex gap-4 items-center">
-              <label className="block text-gray-900 font-medium w-full">
+              {/* <label className="block text-gray-900 font-medium w-full">
                 Enter Current Password
-              </label>
+              </label> */}
               <input
                 type="password"
                 id="currentPassword"
@@ -65,9 +65,9 @@ const SettingPopup = () => {
             </div>
 
             <div className="mb-4 sm:flex gap-4 items-center">
-              <label className="block text-gray-900 font-medium w-full">
+              {/* <label className="block text-gray-900 font-medium w-full">
                 Enter New Password
-              </label>
+              </label> */}
               <input
                 type="password"
                 id="newPassword"
@@ -80,9 +80,9 @@ const SettingPopup = () => {
             </div>
 
             <div className="mb-4 sm:flex gap-4 items-center">
-              <label className="block text-gray-900 font-medium w-full">
+              {/* <label className="block text-gray-900 font-medium w-full">
                 Confirm New Password
-              </label>
+              </label> */}
               <input
                 type="password"
                 id="confirmNewPassword"

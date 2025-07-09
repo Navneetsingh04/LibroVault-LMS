@@ -75,12 +75,20 @@ const Catalog = () => {
 
   return (
     <>
-      <main className="relative flex-1 p-6 pt-28">
+      <main className="relative flex-1 p-4 sm:p-6 pt-24 sm:pt-28">
         <Header />
+        
+        {/* Page Title */}
+        <div className="mb-6">
+          <h2 className="text-xl font-medium md:text-2xl md:font-semibold">
+            Borrowed Books Catalog
+          </h2>
+        </div>
+
         {/* Filter buttons */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 mb-6">
           <button
-            className={`relative rounded sm:rounded-tr-none sm:rounded-br-none sm:rounded-tl-lg sm:rounded-bl-lg text-center border-2 font-semibold py-2 w-full sm:w-72 ${
+            className={`relative rounded-lg sm:rounded-tr-none sm:rounded-br-none text-center border-2 font-semibold py-3 px-4 w-full sm:w-auto sm:min-w-48 transition-colors ${
               filter === "borrowed"
                 ? "bg-black text-white border-black"
                 : "bg-gray-200 text-black border-gray-200 hover:bg-gray-300"
@@ -90,7 +98,7 @@ const Catalog = () => {
             Borrowed Books
           </button>
           <button
-            className={`relative rounded sm:rounded-tl-none sm:rounded-bl-none sm:rounded-tr-lg sm:rounded-br-lg text-center border-2 font-semibold py-2 w-full sm:w-72 ${
+            className={`relative rounded-lg sm:rounded-tl-none sm:rounded-bl-none text-center border-2 font-semibold py-3 px-4 w-full sm:w-auto sm:min-w-48 transition-colors ${
               filter === "overdue"
                 ? "bg-black text-white border-black"
                 : "bg-gray-200 text-black border-gray-200 hover:bg-gray-300"
@@ -101,54 +109,126 @@ const Catalog = () => {
           </button>
         </div>
 
-        {/* Table or Empty Message */}
+        {/* Books Display */}
         {booksToDisplay && booksToDisplay.length > 0 ? (
-          <div className="mt-6 overflow-auto bg-white rounded-md shadow-lg">
-            <table className="min-w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2 text-left">ID</th>
-                  <th className="px-4 py-2 text-left">Username</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Price</th>
-                  <th className="px-4 py-2 text-left">Due Date</th>
-                  <th className="px-4 py-2 text-left">Date & Time</th>
-                  <th className="px-4 py-2 text-left">Return </th>
-                </tr>
-              </thead>
-              <tbody>
-                {booksToDisplay.map((book, index) => (
-                  <tr
-                    key={book._id}
-                    className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
-                  >
-                    <td className="px-4 py-2">{index + 1}</td>
-                    <td className="px-4 py-2">{book?.user.name}</td>
-                    <td className="px-4 py-2">{book?.user.email}</td>
-                    <td className="px-4 py-2">{book?.price}</td>
-                    <td className="px-4 py-2">{formatDate(book.dueDate)}</td>
-                    <td className="px-4 py-2">{formatDateAndTime(book.createdAt)}</td>
-                    <td className="px-4 py-2">
-                     {
-                      book.returnDate ? (
-                        <FaSquareCheck className="text-green-500 text-2xl" />
-                      ) : (
-                        <PiKeyReturnBold
-                          className="text-red-500 text-2xl cursor-pointer"
-                          onClick={() => openReturnBookPopup(book.book, book?.user.email)}
-                        />
-                      )
-                     }
-                    </td>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-auto bg-white rounded-md shadow-lg">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-4 py-3 text-left">ID</th>
+                    <th className="px-4 py-3 text-left">Username</th>
+                    <th className="px-4 py-3 text-left">Email</th>
+                    <th className="px-4 py-3 text-left">Price</th>
+                    <th className="px-4 py-3 text-left">Due Date</th>
+                    <th className="px-4 py-3 text-left">Date & Time</th>
+                    <th className="px-4 py-3 text-center">Return</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {booksToDisplay.map((book, index) => (
+                    <tr
+                      key={book._id}
+                      className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
+                    >
+                      <td className="px-4 py-3">{index + 1}</td>
+                      <td className="px-4 py-3">{book?.user.name}</td>
+                      <td className="px-4 py-3">{book?.user.email}</td>
+                      <td className="px-4 py-3">₹ {book?.title}</td>
+                      <td className="px-4 py-3">{formatDate(book.dueDate)}</td>
+                      <td className="px-4 py-3">{formatDateAndTime(book.createdAt)}</td>
+                      <td className="px-4 py-3 text-center">
+                        {book.returnDate ? (
+                          <FaSquareCheck className="text-green-500 text-2xl mx-auto" />
+                        ) : (
+                          <PiKeyReturnBold
+                            className="text-red-500 text-2xl cursor-pointer hover:text-red-700 mx-auto"
+                            onClick={() => openReturnBookPopup(book.book, book?.user.email)}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {booksToDisplay.map((book, index) => (
+                <div
+                  key={book._id}
+                  className="bg-white rounded-lg shadow-lg p-4 border border-gray-200"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                        {book?.user.name}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-2">
+                        {book?.user.email}
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      {book.returnDate ? (
+                        <div className="flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                          <FaSquareCheck className="text-green-500" />
+                          <span className="text-xs font-medium">Returned</span>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => openReturnBookPopup(book.book, book?.user.email)}
+                          className="flex items-center gap-2 bg-red-100 text-red-800 px-3 py-1 rounded-full hover:bg-red-200 transition-colors"
+                        >
+                          <PiKeyReturnBold className="text-red-500" />
+                          <span className="text-xs font-medium">Return</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Price:</span>
+                      <span className="font-medium">₹ {book?.price}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Due Date:</span>
+                      <span className={`font-medium ${
+                        new Date(book.dueDate) <= new Date() 
+                          ? "text-red-600" 
+                          : "text-gray-900"
+                      }`}>
+                        {formatDate(book.dueDate)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Borrowed On:</span>
+                      <span className="font-medium text-right">
+                        {formatDateAndTime(book.createdAt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Status indicator for overdue books */}
+                  {new Date(book.dueDate) <= new Date() && !book.returnDate && (
+                    <div className="mt-3 p-2 bg-red-50 border-l-4 border-red-400 rounded">
+                      <p className="text-red-700 text-xs font-medium">
+                        ⚠️ This book is overdue
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
-          <h3 className="text-3xl mt-5 font-medium">
-            No {filter === "borrowed" ? "Borrowed" : "Overdue"} Books found in library
-          </h3>
+          <div className="flex items-center justify-center h-32 sm:h-48">
+            <h3 className="text-center font-medium text-lg sm:text-xl md:text-3xl text-gray-500 px-4">
+              No {filter === "borrowed" ? "Borrowed" : "Overdue"} Books found in library
+            </h3>
+          </div>
         )}
       </main>
 

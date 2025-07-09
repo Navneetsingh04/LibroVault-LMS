@@ -51,7 +51,7 @@ const Home = () => {
     <>
       <div className="relative md:pl-64 flex min-h-screen bg-gray-100">
         {/* Hamburger Menu for Mobile */}
-        <div className="md:hidden z-10 absolute right-6 sm:top-6 flex justify-center items-center bg-black rounded-md h-9 w-9 text-white">
+        <div className="md:hidden z-10 absolute right-6 sm:top-6 flex justify-center mt-4 items-center bg-black rounded-md h-9 w-9 text-white">
           <GiHamburgerMenu
             className="text-2xl cursor-pointer"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}

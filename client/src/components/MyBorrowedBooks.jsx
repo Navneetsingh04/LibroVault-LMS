@@ -46,20 +46,20 @@ const MyBorrowedBooks = () => {
 
   return (
     <>
-      <main className="relative flex-1 p-6 pt-28">
+      <main className="relative flex-1 p-4 sm:p-6 pt-24 sm:pt-28">
         <Header />
 
         {/* Sub header */}
-        <header className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center">
+        <header className="mb-6">
           <h2 className="text-xl font-medium md:text-2xl md:font-semibold">
-          Borrowed Books
+            My Borrowed Books
           </h2>
         </header>
 
         {/* Filter buttons */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-center mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 mb-6">
           <button
-            className={`relative rounded sm:rounded-tr-none sm:rounded-br-none sm:rounded-tl-lg sm:rounded-bl-lg text-center border-2 font-semibold py-2 w-full sm:w-72 ${
+            className={`relative rounded-lg sm:rounded-tr-none sm:rounded-br-none text-center border-2 font-semibold py-3 px-4 w-full sm:w-auto sm:min-w-48 transition-colors ${
               filter === "returned"
                 ? "bg-black text-white border-black"
                 : "bg-gray-200 text-black border-gray-200 hover:bg-gray-300"
@@ -69,7 +69,7 @@ const MyBorrowedBooks = () => {
             Returned Books
           </button>
           <button
-            className={`relative rounded sm:rounded-tl-none sm:rounded-bl-none sm:rounded-tr-lg sm:rounded-br-lg text-center border-2 font-semibold py-2 w-full sm:w-72 ${
+            className={`relative rounded-lg sm:rounded-tl-none sm:rounded-bl-none text-center border-2 font-semibold py-3 px-4 w-full sm:w-auto sm:min-w-48 transition-colors ${
               filter === "notReturned"
                 ? "bg-black text-white border-black"
                 : "bg-gray-200 text-black border-gray-200 hover:bg-gray-300"
@@ -80,57 +80,140 @@ const MyBorrowedBooks = () => {
           </button>
         </div>
 
-        {/* Table or Empty Message */}
+        {/* Books Display */}
         {bookToDisplay && bookToDisplay.length > 0 ? (
-          <div className="mt-6 overflow-auto bg-white rounded-md shadow-lg">
-            <table className="min-w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="px-4 py-2 text-left">ID</th>
-                  <th className="px-4 py-2 text-left">Book Title</th>
-                  <th className="px-4 py-2 text-left">Date & Time</th>
-                  <th className="px-4 py-2 text-left">Due Date</th>
-                  <th className="px-4 py-2 text-left">Returned</th>
-                  <th className="px-4 py-2 text-left">View</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookToDisplay.map((book, index) => (
-                  <tr
-                    key={book._id}
-                    className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
-                  >
-                    <td className="px-4 py-2">{index + 1}</td>
-                    <td
-                      onClick={() => openReadBookPopup(book.bookId)}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100 transition duration-300 flex items-center gap-2"
-                    >
-                      {books.find((b) => b._id === book.bookId)?.title ?? "Unknown Title"}
-                    </td>
-                    <td className="px-4 py-2">{formatDate(book.borrowedDate)}</td>
-                    <td className="px-4 py-2">{formatDate(book.dueDate)}</td>
-                    <td className="px-4 py-2">
-                      {book.returned ? "Returned" : "Not Returned"}
-                    </td>
-                    <td className="px-4 py-2">
-                      <BookA
-                        onClick={() => openReadBookPopup(book.bookId)}
-                        className="text-blue-500 hover:underline cursor-pointer"
-                      />
-                    </td>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-auto bg-white rounded-md shadow-lg">
+              <table className="min-w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="px-4 py-3 text-left">ID</th>
+                    <th className="px-4 py-3 text-left">Book Title</th>
+                    <th className="px-4 py-3 text-left">Borrowed Date</th>
+                    <th className="px-4 py-3 text-left">Due Date</th>
+                    <th className="px-4 py-3 text-left">Status</th>
+                    <th className="px-4 py-3 text-center">View</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : filter === "returned" ? (
-          <h3 className="text-3xl mt-5 font-medium">
-            No Returned Books found in library
-          </h3>
+                </thead>
+                <tbody>
+                  {bookToDisplay.map((book, index) => (
+                    <tr
+                      key={book._id}
+                      className={(index + 1) % 2 === 0 ? "bg-gray-50" : ""}
+                    >
+                      <td className="px-4 py-3">{index + 1}</td>
+                      <td
+                        onClick={() => openReadBookPopup(book.bookId)}
+                        className="px-4 py-3 cursor-pointer hover:bg-gray-100 transition duration-300"
+                      >
+                        {books.find((b) => b._id === book.bookId)?.title ?? "Unknown Title"}
+                      </td>
+                      <td className="px-4 py-3">{formatDate(book.borrowedDate)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`${
+                          new Date(book.dueDate) <= new Date() && !book.returned 
+                            ? "text-red-600 font-medium" 
+                            : "text-gray-900"
+                        }`}>
+                          {formatDate(book.dueDate)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            book.returned
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {book.returned ? "Returned" : "Not Returned"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <BookA
+                          onClick={() => openReadBookPopup(book.bookId)}
+                          className="text-blue-500 hover:text-blue-700 cursor-pointer mx-auto"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {bookToDisplay.map((book, index) => (
+                <div
+                  key={book._id}
+                  className="bg-white rounded-lg shadow-lg p-4 border border-gray-200"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-900 mb-2">
+                        {books.find((b) => b._id === book.bookId)?.title ?? "Unknown Title"}
+                      </h3>
+                    </div>
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                        book.returned
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {book.returned ? "Returned" : "Not Returned"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 mb-4 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Borrowed Date:</span>
+                      <span className="font-medium">{formatDate(book.borrowedDate)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Due Date:</span>
+                      <span className={`font-medium ${
+                        new Date(book.dueDate) <= new Date() && !book.returned 
+                          ? "text-red-600" 
+                          : "text-gray-900"
+                      }`}>
+                        {formatDate(book.dueDate)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Overdue warning for non-returned books */}
+                  {new Date(book.dueDate) <= new Date() && !book.returned && (
+                    <div className="mb-4 p-2 bg-red-50 border-l-4 border-red-400 rounded">
+                      <p className="text-red-700 text-xs font-medium">
+                        ⚠️ This book is overdue
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openReadBookPopup(book.bookId)}
+                      className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors w-full justify-center"
+                    >
+                      <BookA size={16} />
+                      <span>View Book</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
-          <h3 className="text-3xl mt-5 font-medium">
-            No Non-Returned Books found in library
-          </h3>
+          <div className="flex items-center justify-center h-32 sm:h-48">
+            <h3 className="text-center font-medium text-lg sm:text-xl md:text-3xl text-gray-500 px-4">
+              {filter === "returned" 
+                ? "No Returned Books found" 
+                : "No Non-Returned Books found"
+              }
+            </h3>
+          </div>
         )}
       </main>
 

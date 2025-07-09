@@ -45,83 +45,102 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen, setSelectedComponent }) => {
       } z-10 transition-all duration-700 md:relative md:left-0 md:w-56 lg:w-60 xl:w-64 flex bg-black text-white flex-col h-full`}
       style={{position: "fixed"}}
     >
-      <div className="px-6 py-4 my-8">
-        <img src={logo_with_title} alt="logo" className="w-full" />
+      <div className="px-6 py-4 my-6">
+        <img src={logo_with_title} alt="logo" className="w-40 h-auto mx-auto" />
       </div>
 
-      <nav className="flex-1 px-6 space-y-4">
+      <nav className="flex-1 px-6 space-y-2">
         <button
-          onClick={() => setSelectedComponent("Dashboard")}
-          className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+          onClick={() => {
+            setSelectedComponent("Dashboard");
+            setIsSideBarOpen(false);
+          }}
+          className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
         >
-          <img src={dashboardIcon} alt="dashboard" className="w-6 h-6" />
-          <span>Dashboard</span>
+          <img src={dashboardIcon} alt="dashboard" className="w-5 h-5 flex-shrink-0" />
+          <span className="text-sm">Dashboard</span>
         </button>
         <button
-          onClick={() => setSelectedComponent("Book")}
-          className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+          onClick={() => {
+            setSelectedComponent("Book");
+            setIsSideBarOpen(false);
+          }}
+          className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
         >
-          <img src={bookIcon} alt="books" className="w-6 h-6" />
-          <span>Books</span>
+          <img src={bookIcon} alt="books" className="w-5 h-5 flex-shrink-0" />
+          <span className="text-sm">Books</span>
         </button>
 
         {isAuthenticated && user?.role === "Admin" && (
           <>
             <button
-              onClick={() => setSelectedComponent("Catalog")}
-              className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+              onClick={() => {
+                setSelectedComponent("Catalog");
+                setIsSideBarOpen(false);
+              }}
+              className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
             >
-              <img src={catalogIcon} alt="catalog" className="w-6 h-6" />
-              <span>Catalog</span>
+              <img src={catalogIcon} alt="catalog" className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">Catalog</span>
             </button>
             <button
-              onClick={() => setSelectedComponent("Users")}
-              className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+              onClick={() => {
+                setSelectedComponent("Users");
+                setIsSideBarOpen(false);
+              }}
+              className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
               >
-              <img src={usersIcon} alt="users" className="w-6 h-6" />
-              <span>Users</span>
+              <img src={usersIcon} alt="users" className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">Users</span>
             </button>
             <button
-              onClick={() => dispatch(toggleAddNewAdminPopup())}
-              className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+              onClick={() => {
+                dispatch(toggleAddNewAdminPopup());
+                setIsSideBarOpen(false);
+              }}
+              className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
             >
-              <RiAdminFill className="text-2xl text-white" /> <span> Add New Admin</span>
+              <RiAdminFill className="text-xl text-white flex-shrink-0" /> 
+              <span className="text-sm">Add New Admin</span>
             </button>
           </>
         )}
 
         {isAuthenticated && user?.role === "User" && (
           <button
-            onClick={() => setSelectedComponent("My Borrowed Books")}
-            className="w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+            onClick={() => {
+              setSelectedComponent("My Borrowed Books");
+              setIsSideBarOpen(false);
+            }}
+            className="w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
           >
-            <img src={catalogIcon} alt="my-borrowed-books" className="w-6 h-6" />
-            <span>Borrowed Books</span>
+            <img src={catalogIcon} alt="my-borrowed-books" className="w-5 h-5 flex-shrink-0" />
+            <span className="text-sm">Borrowed Books</span>
           </button>
         )}
 
         <button
-          className="md:hidden w-full py-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer"
+          className="md:hidden w-full py-3 px-3 font-medium flex items-center space-x-3 hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
           onClick={() => dispatch(toggleSettingPopup())}
         >
-          <img src={settingIcon} alt="Credentials" className="w-6 h-6" />
-          <span>Update Credentials</span>
+          <img src={settingIcon} alt="Credentials" className="w-5 h-5 flex-shrink-0" />
+          <span className="text-sm">Update Credentials</span>
         </button>
       </nav>
 
       <button
         onClick={handleLogout}
-        className="py-3 font-medium text-center flex items-center justify-center space-x-3 hover:bg-red-600 rounded-md mx-auto w-full mb-7 cursor-pointer"
+        className="py-3 px-3 mx-6 mb-6 font-medium text-center flex items-center justify-center space-x-3 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
       >
-        <img src={logoutIcon} alt="logout" className="w-6 h-6" />
-        <span>Log Out</span>
+        <img src={logoutIcon} alt="logout" className="w-5 h-5 flex-shrink-0" />
+        <span className="text-sm">Log Out</span>
       </button>
 
       <img
         src={closeIcon}
         alt="closeIcon"
         onClick={() => setIsSideBarOpen(!isSideBarOpen)}
-        className="absolute top-0 right-4 mt-4 block md:hidden cursor-pointer w-6 h-6"
+        className="absolute top-4 right-4 block md:hidden cursor-pointer w-8 h-8 hover:opacity-75 transition-opacity"
       />
     </aside>
     {addNewAdminPopup && <AddNewAdmin />}

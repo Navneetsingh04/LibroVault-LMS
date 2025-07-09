@@ -43,37 +43,48 @@ const AddNewAdmin = () => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 p-3 sm:p-5 flex items-center justify-center z-50 overflow-auto">
-        <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-xl bg-white rounded-lg shadow-lg">
-          <div className="p-4 sm:p-6">
-            <header className="flex items-center justify-between mb-6 sm:mb-7 pb-4 sm:pb-5 border-b border-black">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center z-50">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-2xl">
+          <div className="p-6 sm:p-8">
+            <header className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
               <div className="flex items-center gap-3">
-                <img
-                  src={keyIcon}
-                  alt="keyIcon"
-                  className="bg-gray-300 p-4 sm:p-5 rounded-lg w-12 sm:w-16"
-                />
-                <h3 className="text-lg sm:text-xl font-bold">Add New Admin</h3>
+                <div className="bg-gradient-to-r from-blue-100 to-blue-200 p-3 rounded-lg">
+                  <img
+                    src={keyIcon}
+                    alt="keyIcon"
+                    className="w-6 h-6"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Add New Admin</h3>
               </div>
-              <img
-                src={closeIcon}
-                alt="close-Icon"
-                className="w-5 sm:w-6 cursor-pointer"
+              <button
+                type="button"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                 onClick={() => dispatch(toggleAddNewAdminPopup())}
-              />
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </header>
-            <form onSubmit={handleNewAdmin}>
+            <form onSubmit={handleNewAdmin} className="space-y-5">
               {/* Avatar Selection */}
               <div className="flex flex-col items-center justify-center mb-6">
                 <label htmlFor="avatarInput" className="cursor-pointer group relative">
-                  <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-full overflow-hidden border-4 border-gray-100 shadow-md hover:shadow-lg transition-all duration-200">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-blue-200">
                     <img
                       src={avatarPreview ? avatarPreview : avatar}
                       alt="Profile avatar"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-full">
-                      <span className="text-white text-sm font-medium">Change</span>
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 rounded-full">
+                      <div className="text-center">
+                        <svg className="w-6 h-6 text-white mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="text-white text-xs font-medium">Change</span>
+                      </div>
                     </div>
                   </div>
                   <input
@@ -84,42 +95,44 @@ const AddNewAdmin = () => {
                     onChange={handleImageChange}
                   />
                 </label>
-                <p className="text-sm text-gray-500 mt-2 text-center">Click to upload profile picture</p>
+                <p className="text-sm text-gray-500 mt-3 text-center">Click to upload profile picture</p>
               </div>
 
               {/* Name Input */}
-              <div className="mb-4 sm:mb-5">
-                <label htmlFor="name" className="block mb-2 font-medium text-sm sm:text-base">
-                  Name
+              <div className="space-y-1">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
+                  Full Name
                 </label>
                 <input
                   type="text"
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter admin's full name"
                   required
-                  className="w-full p-2 sm:p-3 border border-gray-300 rounded-md text-sm sm:text-base"
+                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 />
               </div>
 
               {/* Email Input */}
-              <div className="mb-4 sm:mb-5">
-                <label htmlFor="email" className="block mb-2 font-medium text-sm sm:text-base">
-                  Email
+              <div className="space-y-1">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+                  Email Address
                 </label>
                 <input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter admin's email"
                   required
-                  className="w-full p-2 sm:p-3 border border-gray-300 rounded-md text-sm sm:text-base"
+                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 />
               </div>
 
               {/* Password Input */}
-              <div className="mb-4 sm:mb-5">
-                <label htmlFor="password" className="block mb-2 font-medium text-sm sm:text-base">
+              <div className="space-y-1">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                   Password
                 </label>
                 <input
@@ -127,26 +140,37 @@ const AddNewAdmin = () => {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Create a secure password"
                   required
-                  className="w-full p-2 sm:p-3 border border-gray-300 rounded-md text-sm sm:text-base"
+                  className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                 />
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-end space-x-3 sm:space-x-4">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => dispatch(toggleAddNewAdminPopup())}
-                  className="px-3 sm:px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 text-sm sm:text-base"
+                  className="w-full sm:w-auto px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
                 >
-                  Close
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-3 sm:px-4 py-2 bg-black rounded-md text-white hover:bg-gray-800 text-sm sm:text-base"
+                  className="px-3 sm:px-4 py-2 bg-black rounded-md text-white hover:bg-gray-800 text-sm sm:text-base cursor-pointer"
                 >
-                  Add Admin
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                      </svg>
+                      Creating...
+                    </div>
+                  ) : (
+                    'Create Admin'
+                  )}
                 </button>
               </div>
             </form>

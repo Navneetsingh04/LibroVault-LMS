@@ -21,13 +21,11 @@ const parseError = (error, defaultMessage) => {
       // Clear any stored auth data
       localStorage.removeItem('user');
       sessionStorage.removeItem('user');
-      // Dispatch logout action if needed (you might want to import logout action)
-      // dispatch(logout()); // Uncomment if you have access to logout action
       return "Session expired. Please log in again.";
     }
-    if (error.response.status === 403) return "Forbidden. You don't have permission to perform this action.";
+    if (error.response.status === 403) return "You don't have permission to perform this action.";
     if (error.response.status === 404) return "Resource not found.";
-    if (error.response.status === 409) return "Conflict. This book may already be borrowed or returned.";
+    if (error.response.status === 409) return "This book may already be borrowed or returned.";
     if (error.response.status >= 500) return "Server error. Please try again later.";
     return error.response.data?.message || defaultMessage;
   }
@@ -140,8 +138,6 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
     // Handle 401 errors specifically
     if (error.response?.status === 401) {
       dispatch(borrowSlice.actions.authenticationError());
-      // You might want to redirect to login page here
-      // window.location.href = '/login';
     } else {
       dispatch(borrowSlice.actions.fetchBorrowingsFailure(message));
     }
