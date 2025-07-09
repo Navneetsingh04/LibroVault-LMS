@@ -193,24 +193,17 @@ export const resetSlice = () => (dispatch) => {
 };
 
 export const register = (data) => async (dispatch) => {
-    try {
-        dispatch(authSlice.actions.registerRequest());
-        const res = await axios.post(`https://librovault.onrender.com/api/v1/auth/register`, data, {
-            withCredentials: true,
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        
-        if (res.status === 200 || res.status === 201) {
-            dispatch(authSlice.actions.registerSuccess(res.data));
-        } else {
-            dispatch(authSlice.actions.registerFailed("Unexpected response from server"));
-        }
-    } catch (error) {
-        console.error("Registration error:", error);
+    dispatch(authSlice.actions.registerRequest());
+    await axios.post(`https://librovault.onrender.com/api/v1/auth/register`, data, {
+        withCredentials: true,
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then((res) => {
+        dispatch(authSlice.actions.registerSuccess(res.data)); 
+    }).catch((error) => {
         dispatch(authSlice.actions.registerFailed(error.response?.data?.message || "Registration failed"));
-    }
+    });
 };
 
 export const OTPVerification = (email, otp) => async (dispatch) => {
