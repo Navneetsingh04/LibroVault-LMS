@@ -21,25 +21,46 @@ const Register = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     
+    // Validate fields before submitting
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
     // Use a regular JSON object instead of FormData
     const userData = {
-      name,
-      email,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
       password
     };
     
+    console.log("Registering user with data:", { name: userData.name, email: userData.email });
     dispatch(register(userData));
   };
 
   useEffect(() => {
     if (message) {
-      navigateTo(`/otp-verification/${email}`)
+      console.log("Registration successful, navigating to OTP page");
+      toast.success(message);
+      // Small delay to ensure toast is shown before navigation
+      setTimeout(() => {
+        navigateTo(`/otp-verification/${email}`);
+        dispatch(resetSlice());
+      }, 500);
     }
     if (error) {
+      console.error("Registration error:", error);
       toast.error(error);
       dispatch(resetSlice());
     }
-  }, [dispatch, isAuthenticated, error, message, loading, navigateTo, email]);
+  }, [dispatch, error, message, navigateTo, email]);
 
   if (isAuthenticated) {
     return <Navigate to={"/"} />;

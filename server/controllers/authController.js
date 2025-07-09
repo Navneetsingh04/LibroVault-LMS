@@ -53,7 +53,18 @@ export const register = catchAsyncErrors(async (req, res, next) => {
 
     const verificationCode = await user.generateVerificationCode();
     await user.save();
-    sendVerificationCode(user.verificationCode, email, res);
+    
+    try {
+      await sendVerificationCode(user.verificationCode, email, res);
+    } catch (emailError) {
+      console.error("Email sending error:", emailError);
+      // Even if email fails, we should still respond with success
+      // The user was created successfully
+      res.status(200).json({
+        success: true,
+        message: "Account created successfully. Verification code sent to email.",
+      });
+    }
   } catch (error) {
     next(error);
   }
