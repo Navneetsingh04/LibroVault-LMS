@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import logo from "../assets/black-logo.png";
 import logo_with_title from "../assets/logo-with-title.png";
@@ -10,7 +10,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [registrationEmail, setRegistrationEmail] = useState(""); // Store email for navigation
+  const emailForNavigationRef = useRef(""); // Use ref to store email immediately
 
   const dispatch = useDispatch();
   const { loading, error, message, user, isAuthenticated } = useSelector(
@@ -45,36 +45,48 @@ const Register = () => {
     
     console.log("Registering user with data:", { name: userData.name, email: userData.email });
     
-    // Store cleaned email for navigation
-    setRegistrationEmail(cleanedEmail);
+    // Store cleaned email in ref for navigation
+    emailForNavigationRef.current = cleanedEmail;
     dispatch(register(userData));
   };
 
   useEffect(() => {
-    if (message && registrationEmail) {
+    if (message) {
+      const navigationEmail = emailForNavigationRef.current;
       console.log("Registration successful, navigating to OTP page");
-      console.log("Email for navigation:", registrationEmail);
+      console.log("Email for navigation:", navigationEmail);
+      
+      if (!navigationEmail) {
+        console.error("No email found for navigation");
+        toast.error("Registration successful but navigation failed. Please check your email for OTP.");
+        return;
+      }
+      
       toast.success(message);
       
       // Small delay to ensure toast is shown before navigation
       const timer = setTimeout(() => {
         try {
-          const encodedEmail = encodeURIComponent(registrationEmail);
+          const encodedEmail = encodeURIComponent(navigationEmail);
           console.log("Navigating to:", `/otp-verification/${encodedEmail}`);
           navigateTo(`/otp-verification/${encodedEmail}`);
           dispatch(resetSlice());
+          // Clear the ref after successful navigation
+          emailForNavigationRef.current = "";
         } catch (navError) {
           console.error("Navigation error:", navError);
           // Fallback: try without encoding
           try {
-            navigateTo(`/otp-verification/${registrationEmail}`);
+            console.log("Trying fallback navigation to:", `/otp-verification/${navigationEmail}`);
+            navigateTo(`/otp-verification/${navigationEmail}`);
             dispatch(resetSlice());
+            emailForNavigationRef.current = "";
           } catch (fallbackError) {
             console.error("Fallback navigation also failed:", fallbackError);
-            toast.error("Navigation error. Please manually go to OTP verification page.");
+            toast.error("Registration successful! Please manually navigate to OTP verification page.");
           }
         }
-      }, 1000); // Increased delay slightly
+      }, 1000);
       
       // Cleanup timer
       return () => clearTimeout(timer);
@@ -83,8 +95,10 @@ const Register = () => {
       console.error("Registration error:", error);
       toast.error(error);
       dispatch(resetSlice());
+      // Clear the ref on error
+      emailForNavigationRef.current = "";
     }
-  }, [dispatch, error, message, navigateTo, registrationEmail]);
+  }, [dispatch, error, message, navigateTo]);
 
   if (isAuthenticated) {
     return <Navigate to={"/"} />;
