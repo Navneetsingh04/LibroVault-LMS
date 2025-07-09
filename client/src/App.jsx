@@ -21,7 +21,7 @@ const AppContent = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const publicRoutes = ["/login", "/register", "/password/forgot", "/password/reset"];
+  const publicRoutes = ["/login", "/register", "/password/forgot", "/password/reset", "/otp-verification"];
   const isPublicRoute = publicRoutes.some((route) => location.pathname.startsWith(route));
 
   // Only dispatch getUser if not on public route
