@@ -176,7 +176,14 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   const resetToken = user.generatePasswordResetToken();
 
   await user.save({ validateBeforeSave: false });
-  const resetPasswordUrl = `http://localhost:5173/password/reset/${resetToken}`;
+
+  // Choose URL based on environment
+  const isProduction = process.env.NODE_ENV === 'production';
+  const frontendUrl = isProduction 
+    ? process.env.FRONTEND_URL 
+    : process.env.FRONTEND_URL_DEV || 'http://localhost:5173';
+  
+  const resetPasswordUrl = `${frontendUrl}/password/reset/${resetToken}`;
 
   const message = generateForgotPasswordEmailTemplate(resetPasswordUrl);
 
