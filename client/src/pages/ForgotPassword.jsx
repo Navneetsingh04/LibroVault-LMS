@@ -118,7 +118,7 @@ const ForgotPassword = () => {
                 className={`w-full py-3 rounded-lg font-semibold text-lg transition-all duration-300 transform  ${
                   loading
                     ? "bg-gray-400 text-white cursor-not-allowed"
-                    : "bg-black text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
+                    : "bg-black text-white hover:bg-gray-800 srounded-lg hadow-lg hover:shadow-xl"
                 }`}
               >
                 {loading ? (

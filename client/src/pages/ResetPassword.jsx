@@ -52,14 +52,7 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col md:flex-row">
       {/* Left Section */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-gray-900 to-black text-white flex-col justify-center items-center p-8 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full opacity-10">
-          <div className="absolute top-20 left-20 w-32 h-32 border border-white rounded-full"></div>
-          <div className="absolute bottom-32 right-16 w-24 h-24 border border-white rounded-full"></div>
-          <div className="absolute top-1/2 right-32 w-16 h-16 bg-white rounded-full opacity-20"></div>
-        </div>
-        
+      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-gray-900 to-black text-white flex-col justify-center items-center p-8 relative overflow-hidden rounded-r-4xl">
         <div className="relative z-10 text-center">
           <img
             src={logo_with_title}
@@ -166,10 +159,10 @@ const ResetPassword = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform focus:outline-none focus:ring-4 focus:ring-black/20 ${
+                className={`w-full py-3 rounded-lg font-semibold text-lg transition-all duration-300 transform ${
                   loading
-                    ? "bg-gray-400 text-white cursor-not-allowed transform-none"
-                    : "bg-black text-white hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl"
                 }`}
               >
                 {loading ? (
@@ -179,9 +172,6 @@ const ResetPassword = () => {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center space-x-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
                     <span>Reset Password</span>
                   </div>
                 )}
@@ -198,21 +188,6 @@ const ResetPassword = () => {
                   Sign In
                 </Link>
               </p>
-            </div>
-          </div>
-
-          {/* Security Notice */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <h4 className="text-sm font-semibold text-blue-800 mb-1">Security Tip</h4>
-                <p className="text-xs text-blue-700">
-                  Use a strong password with a mix of letters, numbers, and special characters.
-                </p>
-              </div>
             </div>
           </div>
         </div>
