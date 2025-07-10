@@ -135,7 +135,7 @@ const Catalog = () => {
                       <td className="px-4 py-3">{index + 1}</td>
                       <td className="px-4 py-3">{book?.user.name}</td>
                       <td className="px-4 py-3">{book?.user.email}</td>
-                      <td className="px-4 py-3">₹ {book?.title}</td>
+                      <td className="px-4 py-3">₹ {book?.price}</td>
                       <td className="px-4 py-3">{formatDate(book.dueDate)}</td>
                       <td className="px-4 py-3">{formatDateAndTime(book.createdAt)}</td>
                       <td className="px-4 py-3 text-center">
