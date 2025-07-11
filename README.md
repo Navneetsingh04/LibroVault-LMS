@@ -2,6 +2,8 @@
 
 A comprehensive digital library management system built with React.js and Node.js that enables efficient management of books, users, and borrowing operations.
 
+- [Live Demo](https://librovault.vercel.app)
+
 ## 🌟 Features
 
 ### 👤 User Management
@@ -62,63 +64,6 @@ A comprehensive digital library management system built with React.js and Node.j
 - **Cookie Parser** - Cookie handling
 - **CORS** - Cross-origin resource sharing
 
-## 📁 Project Structure
-
-```
-Library Management System/
-├── client/                     # Frontend React application
-│   ├── public/                 # Static assets
-│   ├── src/
-│   │   ├── assets/            # Images and static files
-│   │   ├── components/        # React components
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── UserDashboard.jsx
-│   │   │   ├── BookManagement.jsx
-│   │   │   ├── Catalog.jsx
-│   │   │   ├── Users.jsx
-│   │   │   └── MyBorrowedBooks.jsx
-│   │   ├── layout/            # Layout components
-│   │   │   ├── Header.jsx
-│   │   │   └── SideBar.jsx
-│   │   ├── pages/             # Page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── ForgotPassword.jsx
-│   │   │   ├── OTP.jsx
-│   │   │   └── ResetPassword.jsx
-│   │   ├── popups/            # Modal components
-│   │   ├── store/             # Redux store and slices
-│   │   └── App.jsx
-│   ├── package.json
-│   └── vite.config.js
-├── server/                     # Backend Node.js application
-│   ├── config/                # Configuration files
-│   │   └── config.env
-│   ├── controllers/           # Route controllers
-│   │   ├── authController.js
-│   │   ├── bookController.js
-│   │   ├── borrowController.js
-│   │   └── userController.js
-│   ├── database/              # Database connection
-│   │   └── db.js
-│   ├── middlewares/           # Custom middlewares
-│   ├── models/                # Mongoose models
-│   │   ├── userModel.js
-│   │   ├── bookModel.js
-│   │   └── borrowModel.js
-│   ├── routes/                # API routes
-│   ├── services/              # Background services
-│   │   ├── notifyUsers.js
-│   │   └── removeUnverifiedAccounts.js
-│   ├── utils/                 # Utility functions
-│   ├── uploads/               # File upload directory
-│   ├── app.js
-│   ├── server.js
-│   └── package.json
-└── README.md
-```
-
 ## 🚀 Installation & Setup
 
 ### Prerequisites
@@ -137,28 +82,6 @@ cd "Library Management System"
 ```bash
 cd server
 npm install
-```
-
-Create a `config.env` file in the `server/config/` directory:
-```env
-PORT=4000
-FRONTEND_URL=http://localhost:5173
-
-MONGO_URI=your_mongodb_connection_string
-
-SMTP_HOST=smtp.gmail.com
-SMTP_SERVICE=gmail
-SMTP_PORT=465
-SMTP_EMAIL=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRE=7d
-COOKIE_EXPIRE=7
 ```
 
 ### 3. Frontend Setup
