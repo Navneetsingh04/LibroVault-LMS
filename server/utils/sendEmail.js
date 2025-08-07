@@ -14,7 +14,7 @@ export const sendEmail = async ({ email, subject, message }) => {
     });
 
     const mailOptions = {
-      from: process.env.SMTP_EMAIL,
+      from: `LibroValut <${process.env.SMTP_EMAIL}>`,
       to: email,
       subject: subject,
       html: message,
