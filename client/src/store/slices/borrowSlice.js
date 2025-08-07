@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleRecordBookPopup } from "./popUpSlice";
+import { BORROW_URL } from "../../config/api.js";
 
 // Helper function to get axios config with auth headers
 const getAuthConfig = () => {
@@ -122,7 +123,7 @@ export const fetchUserBorrowedBooks = () => async (dispatch) => {
   dispatch(borrowSlice.actions.fetchBorrowingsRequest());
   try {
     const response = await axios.get(
-      "https://librovault.onrender.com/api/v1/borrow/my-borrowed-books",
+      `${BORROW_URL}/my-borrowed-books`,
       { 
         ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
@@ -148,7 +149,7 @@ export const fetchAllBorrowedBooks = () => async (dispatch) => {
   dispatch(borrowSlice.actions.fetchAllBorrowingsRequest());
   try {
     const response = await axios.get(
-      "https://librovault.onrender.com/api/v1/borrow/borrowed-books-by-users",
+      `${BORROW_URL}/borrowed-books-by-users`,
       { 
         ...getAuthConfig(),
         timeout: 30000, // 30 second timeout
@@ -176,7 +177,7 @@ export const recordBorrowedBook = (email, id) => async (dispatch) => {
   dispatch(borrowSlice.actions.recordBookRequest());
   try {
     const response = await axios.post(
-      `https://librovault.onrender.com/api/v1/borrow/record-borrow-book/${id}`,
+      `${BORROW_URL}/record-borrow-book/${id}`,
       { email },
       {
         ...getAuthConfig(),
@@ -206,7 +207,7 @@ export const returnBorrowedBook = (email, id) => async (dispatch) => {
   dispatch(borrowSlice.actions.returnBookRequest());
   try {
     const response = await axios.put(
-      `https://librovault.onrender.com/api/v1/borrow/return-borrowed-book/${id}`,
+      `${BORROW_URL}/return-borrowed-book/${id}`,
       { email },
       {
         ...getAuthConfig(),

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toggleAddBookPopup } from "./popUpSlice";
+import { BOOK_URL } from "../../config/api.js";
 
 // Helper function to get axios config with auth headers
 const getAuthConfig = () => {
@@ -115,7 +116,7 @@ const bookSlice = createSlice({
 export const fetchAllBooks = () => async (dispatch) => {
   dispatch(bookSlice.actions.fetchBooksRequest());
   try {
-    const response = await axios.get("https://librovault.onrender.com/api/v1/book/all", {
+    const response = await axios.get(`${BOOK_URL}/all`, {
       ...getAuthConfig(),
       timeout: 30000, // 30 second timeout
     });
@@ -137,7 +138,7 @@ export const addBook = (bookData) => async (dispatch) => {
       : { "Content-Type": "application/json" };
 
     const response = await axios.post(
-      "https://librovault.onrender.com/api/v1/book/admin/add",
+      `${BOOK_URL}/admin/add`,
       bookData,
       {
         ...(isFormData ? getAuthConfigMultipart() : getAuthConfig()),
@@ -162,7 +163,7 @@ export const deleteBook = (bookId) => async (dispatch) => {
   dispatch(bookSlice.actions.deleteBookRequest());
   try {
     const response = await axios.delete(
-      `https://librovault.onrender.com/api/v1/book/delete/${bookId}`,
+      `${BOOK_URL}/delete/${bookId}`,
       {
         ...getAuthConfig(),
         timeout: 30000, // 30 second timeout

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { toggleAddNewAdminPopup } from "./popUpSlice";
+import { USER_URL } from "../../config/api.js";
 
 // Helper function to get axios config with auth headers
 const getAuthConfig = () => {
@@ -110,7 +111,7 @@ export const fetchAllUsers = () => async (dispatch) => {
   dispatch(userSlice.actions.fetchAllUsersRequest());
   try {
     const response = await axios.get(
-      "https://librovault.onrender.com/api/v1/user/all",
+      `${USER_URL}/all`,
       { 
         ...getAuthConfig(),
         timeout: 30000,
@@ -141,7 +142,7 @@ export const addNewAdmin = (data) => async (dispatch) => {
   dispatch(userSlice.actions.addNewAdminRequest());
   try {
     const response = await axios.post(
-      "https://librovault.onrender.com/api/v1/user/add/new-admin", 
+      `${USER_URL}/add/new-admin`, 
       data, 
       {
         ...getAuthConfigMultipart(),

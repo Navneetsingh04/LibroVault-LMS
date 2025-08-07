@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { AUTH_URL } from "../../config/api.js";
 
 // Helper function to get cookie value
 const getCookie = (name) => {
@@ -10,12 +11,11 @@ const getCookie = (name) => {
 
 // Helper function to get axios config with auth headers
 const getAuthConfig = () => {
-    // Try to get token from localStorage first, then from cookies
     let token = localStorage.getItem('authToken');
     if (!token) {
         token = getCookie('token');
         if (token) {
-            localStorage.setItem('authToken', token); // Store for future use
+            localStorage.setItem('authToken', token); 
         }
     }
     return {
@@ -194,7 +194,7 @@ export const resetSlice = () => (dispatch) => {
 
 export const register = (data) => async (dispatch) => {
     dispatch(authSlice.actions.registerRequest());
-    await axios.post(`https://librovault.onrender.com/api/v1/auth/register`, data, {
+    await axios.post(`${AUTH_URL}/register`, data, {
         withCredentials: true,
         headers: {
             "Content-Type": "application/json",
@@ -209,7 +209,7 @@ export const register = (data) => async (dispatch) => {
 export const OTPVerification = (email, otp) => async (dispatch) => {
     try {
         dispatch(authSlice.actions.OTPVerificationRequest());
-        const res = await axios.post(`https://librovault.onrender.com/api/v1/auth/verifyOTP`, {email, otp}, {
+        const res = await axios.post(`${AUTH_URL}/verifyOTP`, {email, otp}, {
             withCredentials: true,
             headers: {
                 "Content-Type": "application/json",
@@ -229,7 +229,7 @@ export const OTPVerification = (email, otp) => async (dispatch) => {
 export const login = (data) => async (dispatch) => {
     try {
       dispatch(authSlice.actions.loginRequest());
-      const res = await axios.post(`https://librovault.onrender.com/api/v1/auth/login`, data, {
+      const res = await axios.post(`${AUTH_URL}/login`, data, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +251,7 @@ export const login = (data) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
     try {
         dispatch(authSlice.actions.logoutRequest());
-        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/logout`, getAuthConfig());
+        const res = await axios.get(`${AUTH_URL}/logout`, getAuthConfig());
         
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.logoutSuccess(res.data.message));
@@ -268,7 +268,7 @@ export const logout = () => async (dispatch) => {
 export const getUser = () => async (dispatch) => {
     try {
         dispatch(authSlice.actions.getUserRequest());
-        const res = await axios.get(`https://librovault.onrender.com/api/v1/auth/me`, {
+        const res = await axios.get(`${AUTH_URL}/me`, {
             ...getAuthConfig(),
             timeout: 30000, // 30 second timeout
         });
@@ -298,7 +298,7 @@ export const getUser = () => async (dispatch) => {
 export const forgotPassword = (email) => async (dispatch) => {
     try {
         dispatch(authSlice.actions.forgotPasswordRequest());
-        const res = await axios.post(`https://librovault.onrender.com/api/v1/auth/password/forgot`, {email}, {
+        const res = await axios.post(`${AUTH_URL}/password/forgot`, {email}, {
             withCredentials: true,
             headers: {
                 "Content-Type": "application/json",
@@ -319,7 +319,7 @@ export const resetPassword = (data, token) => async (dispatch) => {
     try {
         dispatch(authSlice.actions.resetPasswordRequest());
 
-        const res = await axios.put(`https://librovault.onrender.com/api/v1/auth/password/reset/${token}`, data, {
+        const res = await axios.put(`${AUTH_URL}/password/reset/${token}`, data, {
             withCredentials: true,
             headers: {
                 "Content-Type": "application/json",
@@ -342,7 +342,7 @@ export const resetPassword = (data, token) => async (dispatch) => {
 export const updatePassword = (data) => async (dispatch) => {
     try {
         dispatch(authSlice.actions.updatePasswordRequest());
-        const res = await axios.put(`https://librovault.onrender.com/api/v1/auth/password/update`, data, getAuthConfig());
+        const res = await axios.put(`${AUTH_URL}/password/update`, data, getAuthConfig());
         
         if (res.status === 200 || res.status === 201) {
             dispatch(authSlice.actions.updatePasswordSuccess(res.data.message));
